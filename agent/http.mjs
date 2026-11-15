@@ -3,6 +3,8 @@ import { createReadStream, existsSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
 import { pairPath } from "./config.mjs";
+import { installHook, uninstallHooks } from "./hooks.mjs";
+import { installRepoHooks, uninstallRepoHooks } from "./repo-hooks.mjs";
 
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -23,7 +25,7 @@ function readBody(request) {
   });
 }
 
-export function createAgentHttp({ config, hub, frontendDir }) {
+export function createAgentHttp({ config, hub, frontendDir, root }) {
   const sessions = new Map();
   let pairCode = config.token;
   let pairExpires = Date.now() + 5 * 60 * 1000;
@@ -123,6 +125,40 @@ export function createAgentHttp({ config, hub, frontendDir }) {
         return;
       }
       hub.attach(response, Number(request.headers["last-event-id"]) || 0);
+      return;
+    }
+    if (url.pathname === "/api/integration" && request.method === "POST") {
+      try {
+        const body = JSON.parse(await readBody(request));
+        const session = sessions.get(body.session);
+        if (
+          !session ||
+          session.expires < Date.now() ||
+          session.origin !== callerOrigin
+        ) {
+          response.writeHead(401);
+          response.end("Primero conecta el agente.");
+          return;
+        }
+        const actions = {
+          "install-shell": () =>
+            installHook(process.env.SHELL?.endsWith("zsh") ? "zsh" : "bash"),
+          "uninstall-shell": () => uninstallHooks(),
+          "install-hooks": () => installRepoHooks(root),
+          "uninstall-hooks": () => uninstallRepoHooks(root),
+        };
+        if (!Object.hasOwn(actions, body.action)) {
+          response.writeHead(400);
+          response.end("Accion desconocida.");
+          return;
+        }
+        actions[body.action]();
+        response.setHeader("Content-Type", "application/json");
+        response.end(JSON.stringify({ ok: true }));
+      } catch (error) {
+        response.writeHead(500);
+        response.end(error.message);
+      }
       return;
     }
     if (request.method !== "GET") {

@@ -19,6 +19,7 @@ let currentSnapshot = demo;
 let generation = 0;
 
 function renderSnapshot(snapshot) {
+  byId("setup-repo").textContent = snapshot.repo || "Sin conexión";
   renderScene(snapshot);
   renderHistory(snapshot);
   renderGraph(snapshot);
@@ -154,6 +155,41 @@ byId("pair-token").addEventListener("keydown", (event) => {
   if (event.key === "Enter") void connect();
 });
 byId("demo-button").addEventListener("click", startDemo);
+document
+  .querySelector(".setup-buttons")
+  .addEventListener("click", async (event) => {
+    const action = event.target.dataset.integration;
+    if (!action) return;
+    const result = byId("setup-result");
+    if (!client.session) {
+      result.textContent = "Primero conecta el agente.";
+      return;
+    }
+    try {
+      const response = await fetch(`${client.base}/api/integration`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session: client.session, action }),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      result.textContent =
+        "Cambio guardado. Abre una terminal nueva si cambiaste la integración.";
+    } catch {
+      result.textContent = "No se pudo guardar el cambio. Revisa el agente.";
+    }
+  });
+byId("test-connection").addEventListener("click", async () => {
+  const result = byId("setup-result");
+  try {
+    const response = await fetch(`${client.base}/api/health`);
+    result.textContent =
+      response.ok && client.session
+        ? "Conexión activa con el agente."
+        : "El agente responde, pero falta conectar el código.";
+  } catch {
+    result.textContent = "No se pudo contactar al agente.";
+  }
+});
 byId("presentation-button").addEventListener("click", () =>
   document.body.classList.toggle("presentation"),
 );

@@ -30,6 +30,7 @@ import {
   tracePath,
 } from "./config.mjs";
 import { installHook, uninstallHooks } from "./hooks.mjs";
+import { installRepoHooks, uninstallRepoHooks } from "./repo-hooks.mjs";
 
 const command = process.argv[2] || "help";
 const wrapper = resolve(fileURLToPath(new URL("../gitviz", import.meta.url)));
@@ -141,6 +142,27 @@ switch (command) {
     );
     break;
   }
+  case "hook-event": {
+    if (!existsSync(socketPath)) break;
+    const socket = createConnection(socketPath);
+    socket.on("error", () => {});
+    socket.end(JSON.stringify({ cwd: process.cwd(), hook: process.argv[3] }));
+    break;
+  }
+  case "instalar-hooks":
+    console.log(
+      installRepoHooks(process.cwd())
+        ? "Hooks instalados en este repositorio."
+        : "Los hooks ya estaban instalados.",
+    );
+    break;
+  case "quitar-hooks":
+    console.log(
+      uninstallRepoHooks(process.cwd())
+        ? "Hooks retirados de este repositorio."
+        : "No hay hooks de Git Visual que retirar.",
+    );
+    break;
   case "hook": {
     const action = process.argv[3];
     if (action === "install") {
@@ -165,6 +187,11 @@ switch (command) {
   }
   case "uninstall": {
     stop();
+    try {
+      uninstallRepoHooks(process.cwd());
+    } catch {
+      /* The current folder may not be a repository. */
+    }
     uninstallHooks();
     const config = loadConfig();
     if (config && !restoreTraceConfig(config))

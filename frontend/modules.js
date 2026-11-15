@@ -30,6 +30,20 @@ export function setupModules() {
   const dashboard = document.querySelector(".dashboard");
   const panels = [...dashboard.children];
   screens[0].append(document.querySelector("#connection-panel"));
+  const setupTools = document.createElement("div");
+  setupTools.className = "panel setup-tools";
+  setupTools.innerHTML = `<h2>Preparar Git Visual</h2>
+    <p>Repositorio observado: <strong id="setup-repo">Sin conexión</strong></p>
+    <p>La integración de terminal añade un bloque a tu archivo de inicio de bash o zsh. Los hooks añaden avisos a este repositorio y conservan tus hooks actuales.</p>
+    <div class="setup-buttons">
+      <button type="button" data-integration="install-shell">Instalar integración de terminal</button>
+      <button type="button" data-integration="uninstall-shell">Quitar integración de terminal</button>
+      <button type="button" data-integration="install-hooks">Instalar hooks</button>
+      <button type="button" data-integration="uninstall-hooks">Quitar hooks</button>
+      <button type="button" id="test-connection">Probar conexión</button>
+    </div>
+    <p id="setup-result" role="status"></p>`;
+  screens[0].append(setupTools);
   screens[1].append(
     document.querySelector("#narration"),
     document.querySelector(".pipeline-wrap"),

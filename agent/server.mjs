@@ -20,7 +20,7 @@ export async function startAgent(root, config) {
     "..",
     "frontend",
   );
-  const http = createAgentHttp({ config, hub, frontendDir });
+  const http = createAgentHttp({ config, hub, frontendDir, root });
   const trace = new TraceReader(
     tracePath,
     root,
@@ -95,6 +95,10 @@ export async function startAgent(root, config) {
         const input = JSON.parse(data);
         const cwd = resolve(input.cwd);
         if (cwd !== root && !cwd.startsWith(root + sep)) return;
+        if (typeof input.hook === "string") {
+          void refresh({ argv: ["git", input.hook], source: "hook" });
+          return;
+        }
         if (typeof input.command !== "string" || input.command.length > 300)
           return;
         if (/^\s*git(?:\s|$)/.test(input.command)) return;
