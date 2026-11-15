@@ -1,0 +1,107 @@
+.sidebar {
+  min-width: 0;
+  border-left: 1px solid #243048;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #0d1421;
+}
+.panel {
+  padding: 18px;
+  border: 1px solid #283951;
+  border-radius: 14px;
+  background: #141f30;
+}
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.panel h2 {
+  font-size: 19px;
+  letter-spacing: -0.04em;
+}
+.panel-sigil {
+  font-size: 24px;
+  color: #6fbcf5;
+}
+.panel-sigil.purple {
+  color: var(--purple);
+}
+.help {
+  font-size: 12px;
+  color: #aab9d0;
+  margin-bottom: 13px;
+}
+.panel label {
+  display: block;
+  color: #b8c6dc;
+  font-size: 11px;
+  font-weight: 700;
+  margin: 11px 0 5px;
+}
+.panel input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #3b4c68;
+  border-radius: 8px;
+  padding: 9px 10px;
+  color: var(--text);
+  background: #0c1523;
+  font:
+    12px ui-monospace,
+    monospace;
+}
+.connect-row {
+  display: flex;
+  gap: 7px;
+}
+.connect-row input {
+  flex: 1;
+}
+.form-error {
+  min-height: 17px;
+  margin-top: 8px;
+  color: #ffacb8;
+  font-size: 11px;
+}
+.mode-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 3px;
+}
+.mode-row .button {
+  border: 0;
+  font-size: 11px;
+  padding: 4px;
+}
+.debug-panel {
+  border-top: 1px solid #34425a;
+  margin-top: 12px;
+  padding-top: 11px;
+  color: #9eafc8;
+  font-size: 11px;
+}
+.debug-panel span {
+  display: block;
+  margin: 3px 0;
+}
+.debug-panel b {
+  color: #d8edff;
+}
+.count {
+  font:
+    11px ui-monospace,
+    monospace;
+  color: #9eb8d5;
+  background: #27384e;
+  border-radius: 20px;
+  padding: 4px 7px;
+}
+.activity-panel {
+  flex: 1;
+  min-height: 250px;
+}
