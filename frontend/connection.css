@@ -1,0 +1,65 @@
+.connection-panel {
+  margin: 0 18px 16px;
+}
+.connection-panel summary {
+  cursor: pointer;
+  padding: 11px 14px;
+  font-size: 12px;
+}
+.connection-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 12px;
+  padding: 4px 14px 14px;
+  align-items: end;
+}
+.connection-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.connection-help {
+  padding: 0 14px;
+  color: var(--muted);
+  font-size: 12px;
+  max-width: 900px;
+}
+.form-error {
+  color: var(--red);
+  padding: 0 14px;
+  font-size: 12px;
+}
+.mode-row {
+  padding: 0 14px 14px;
+  display: flex;
+  gap: 8px;
+}
+.debug-panel {
+  display: flex;
+  gap: 20px;
+  margin: 0 14px 14px;
+  color: var(--muted);
+  font: 11px var(--mono);
+}
+.guide-label {
+  font: 10px var(--mono);
+  color: var(--blue);
+  padding: 5px 8px;
+  background: #13203d;
+  border: 1px solid #294b87;
+  border-radius: 4px;
+}
+.guide-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.guide-controls button {
+  font-size: 11px;
+  padding: 5px 8px;
+}
+.zone:focus-visible {
+  outline-offset: 1px;
+}
