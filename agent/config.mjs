@@ -1,4 +1,4 @@
-import { randomBytes } from "node:crypto";
+import { randomInt } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -17,6 +17,7 @@ export const tracePath = join(stateDir, "trace2.sock");
 export const pidPath = join(stateDir, "agent.pid");
 export const logPath = join(stateDir, "agent.log");
 export const socketPath = join(stateDir, "commands.sock");
+export const pairPath = join(stateDir, "pair-code");
 
 export function ensureDirectories() {
   mkdirSync(configDir, { recursive: true, mode: 0o700 });
@@ -52,7 +53,7 @@ export function installConfig() {
   let config = loadConfig();
   if (!config) {
     config = {
-      token: randomBytes(24).toString("base64url"),
+      token: String(randomInt(1000000)).padStart(6, "0"),
       port: 43721,
       allowedOrigins: [
         "http://127.0.0.1:43721",

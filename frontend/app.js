@@ -90,7 +90,6 @@ async function connect() {
   try {
     await client.connect(base, token);
     clearTimeline();
-    sessionStorage.setItem("gitviz-token", token);
     localStorage.setItem("gitviz-agent", base);
   } catch (error) {
     setStatus("disconnected");
@@ -152,7 +151,6 @@ byId("debug-button").addEventListener("click", () => {
 });
 byId("agent-url").value =
   localStorage.getItem("gitviz-agent") || byId("agent-url").value;
-byId("pair-token").value = sessionStorage.getItem("gitviz-token") || "";
 setupGuide();
 currentSnapshot = {
   files: [],
@@ -163,4 +161,3 @@ currentSnapshot = {
 };
 renderSnapshot(currentSnapshot);
 setStatus("disconnected");
-if (byId("pair-token").value) void connect();

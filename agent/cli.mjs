@@ -23,6 +23,7 @@ import {
   loadConfig,
   logPath,
   pidPath,
+  pairPath,
   restoreTraceConfig,
   saveConfig,
   socketPath,
@@ -106,7 +107,9 @@ switch (command) {
   case "token": {
     const config = loadConfig();
     if (!config) throw new Error("Git Visual no esta instalado.");
-    console.log(config.token);
+    console.log(
+      existsSync(pairPath) ? readFileSync(pairPath, "utf8") : config.token,
+    );
     break;
   }
   case "allow-origin": {
@@ -174,7 +177,14 @@ switch (command) {
       readlinkSync(userBin) === wrapper
     )
       rmSync(userBin);
-    for (const path of [configPath, tracePath, logPath, pidPath, socketPath])
+    for (const path of [
+      configPath,
+      tracePath,
+      logPath,
+      pidPath,
+      socketPath,
+      pairPath,
+    ])
       if (existsSync(path)) rmSync(path);
     console.log("Git Visual desinstalado.");
     break;
