@@ -1,0 +1,83 @@
+.dashboard {
+  display: grid;
+  grid-template-columns: 270px minmax(300px, 1fr) 290px;
+  gap: 14px;
+  padding: 16px 18px;
+  align-items: stretch;
+}
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--surface);
+  min-width: 0;
+  overflow: hidden;
+}
+.panel-heading {
+  min-height: 42px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  gap: 8px;
+}
+.panel-heading h2 {
+  font-size: 12px;
+  margin: 0;
+  font-weight: 600;
+}
+.panel-heading small {
+  font: 10px var(--mono);
+  color: var(--muted);
+}
+.subheading {
+  border-top: 1px solid var(--line);
+}
+.branch-list {
+  padding: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.branch-list .current {
+  border-color: #376be0;
+  color: var(--blue);
+}
+.remote-list {
+  padding: 0 12px 12px;
+  font: 10px var(--mono);
+  color: var(--muted);
+}
+.remote-pill {
+  padding: 4px 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.actor {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  font-size: 11px;
+}
+.actor small {
+  color: var(--muted);
+  font-size: 10px;
+}
+.actor.ready strong {
+  color: var(--green);
+}
+.actor.failed strong {
+  color: var(--red);
+}
+.actor.working strong {
+  color: #e6b45d;
+}
+.help-inline {
+  padding: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
