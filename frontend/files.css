@@ -1,0 +1,70 @@
+.notebook {
+  padding: 8px 9px 8px 14px;
+  border: 1px solid #3d6583;
+  border-left: 6px solid #55b7f3;
+  border-radius: 6px 9px 9px 6px;
+  background: #1a3046;
+  animation: appear 0.28s ease-out;
+}
+.notebook.current {
+  border-color: #7b7cf2;
+  border-left-color: #a99bfd;
+  background: #2c3158;
+}
+.notebook .book-name {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.notebook small {
+  display: block;
+  color: #a8bfd2;
+  font:
+    10px ui-monospace,
+    monospace;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.book-pages {
+  display: flex;
+  gap: 2px;
+  margin-top: 5px;
+}
+.book-pages i {
+  height: 12px;
+  width: 14px;
+  background: #c5dced;
+  border-radius: 2px 3px 2px 2px;
+  box-shadow: inset 0 -3px #6c9abc;
+}
+.remote-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid #5f4c84;
+  border-radius: 8px;
+  background: #30254d;
+  color: #dccdff;
+  font:
+    11px ui-monospace,
+    monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.review-row {
+  grid-column: 2/5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  z-index: 1;
+}
