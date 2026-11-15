@@ -66,6 +66,9 @@ test("hosted origin pairs and receives a real Git event quickly", async (t) => {
   });
 
   const base = `http://127.0.0.1:${port}`;
+  const page = await fetch(base);
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /Git Visual/);
   const denied = await fetch(`${base}/api/pair`, {
     method: "POST",
     headers: { Origin: "https://bad.test", "Content-Type": "application/json" },
@@ -120,4 +123,26 @@ test("hosted origin pairs and receives a real Git event quickly", async (t) => {
     Date.now() - started < 1000,
     "git add debe aparecer en menos de 1 segundo",
   );
+
+  async function expectCommand(args, expectedType) {
+    const startedAt = Date.now();
+    command(root, `af_unix:stream:${tracePath}`, ...args);
+    const observed = await nextMessage(
+      reader,
+      (message) =>
+        message.kind === "event" &&
+        message.event.command.startsWith(`git ${args[0]}`),
+    );
+    assert.equal(observed.event.type, expectedType);
+    assert.ok(Date.now() - startedAt < 1000);
+    return observed;
+  }
+
+  await expectCommand(["commit", "-m", "primer cambio"], "commit");
+  writeFileSync(join(root, "app.js"), "console.log(2);\n");
+  await expectCommand(["add", "app.js"], "add");
+  await expectCommand(["restore", "--staged", "app.js"], "unstage");
+  await expectCommand(["branch", "tema"], "branch");
+  await expectCommand(["branch", "-d", "tema"], "branch_delete");
+  await expectCommand(["status", "--short"], "inspect");
 });
