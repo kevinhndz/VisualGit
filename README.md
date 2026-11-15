@@ -2,6 +2,21 @@
 
 Git Visual convierte lo que haces con Git en una escena animada para explicar repositorios en clase. El agente corre en tu Ubuntu y observa un repositorio real. La pagina puede abrirse en localhost o desde GitHub Pages en **la misma computadora**. Una pagina publicada no puede leer el disco por si sola: siempre necesita el agente local.
 
+## Recorrido visual
+
+La interfaz muestra seis escenas: computadora, bandeja de staging, archivo local,
+nube de GitHub, robot de CI e integracion. Debajo aparecen los archivos, el
+historial de commits, las ramas y los Pull Requests del repositorio observado.
+
+Los botones de comandos y los controles Anterior/Siguiente permiten explorar
+conceptos. Usa **Volver en vivo** para que la escena seleccionada vuelva a seguir
+los comandos de la terminal. Los datos del repositorio siguen actualizandose
+mientras exploras. **Ver demostracion** muestra una secuencia de ejemplo y cambia
+el indicador de conexion a modo demostracion; **Conectar** regresa al agente real.
+
+La sexta escena muestra integraciones informadas por GitHub. No afirma que un
+despliegue este publicado: esa informacion depende del pipeline del proyecto.
+
 ## Requisitos
 
 - Ubuntu con [Node.js 18 o superior](https://nodejs.org/en/download).

@@ -1,7 +1,9 @@
 import { AgentClient } from "./client.js";
+import { setupGuide } from "./guide.js";
+import { renderHistory } from "./history.js";
 import { renderGraph } from "./graph.js";
 import { showLatency } from "./metrics.js";
-import { addTimeline } from "./timeline.js";
+import { addTimeline, clearTimeline } from "./timeline.js";
 import { renderPullRequests } from "./github.js";
 import { animateEvent, renderScene } from "./scene.js";
 import { demoSteps, freshDemo } from "./simulator.js";
@@ -12,8 +14,23 @@ let busy = false;
 let demo = freshDemo();
 let demoTimer = null;
 let currentSnapshot = demo;
+let generation = 0;
+
+function renderSnapshot(snapshot) {
+  renderScene(snapshot);
+  renderHistory(snapshot);
+  renderGraph(snapshot);
+  renderPullRequests(snapshot);
+}
 
 function setStatus(status) {
+  if (status === "connected") {
+    byId("connection-panel").open = false;
+    byId("narration-title").textContent = "Repositorio conectado";
+    byId("narration-text").textContent =
+      "Ejecuta tus comandos en la terminal para seguir el recorrido de los cambios.";
+  }
+  if (status === "disconnected") byId("connection-panel").open = true;
   const dot = byId("connection-dot");
   dot.className = `status-dot ${status === "connected" ? "connected" : status === "demo" ? "" : "disconnected"}`;
   byId("connection-label").textContent =
@@ -27,19 +44,18 @@ function setStatus(status) {
 
 function enqueue(event, snapshot) {
   showLatency(event);
-  queue.push({ event, snapshot });
+  queue.push({ event, snapshot, version: generation });
   if (!busy) void drainQueue();
 }
 
 async function drainQueue() {
   busy = true;
   while (queue.length) {
-    const { event, snapshot } = queue.shift();
+    const { event, snapshot, version } = queue.shift();
+    if (version !== generation) continue;
     if (snapshot) {
       currentSnapshot = snapshot;
-      renderScene(snapshot);
-      renderGraph(snapshot);
-      renderPullRequests(snapshot);
+      renderSnapshot(snapshot);
     }
     addTimeline(event);
     animateEvent(event);
@@ -51,20 +67,18 @@ async function drainQueue() {
 const client = new AgentClient((message) => {
   if (message.kind === "snapshot") {
     currentSnapshot = message.snapshot;
-    renderScene(currentSnapshot);
-    renderGraph(currentSnapshot);
-    renderPullRequests(currentSnapshot);
+    renderSnapshot(currentSnapshot);
   } else if (message.kind === "event") {
     enqueue(message.event, message.snapshot);
   } else if (message.kind === "github") {
     currentSnapshot.github = message.github;
-    renderScene(currentSnapshot);
-    renderGraph(currentSnapshot);
-    renderPullRequests(currentSnapshot);
+    renderSnapshot(currentSnapshot);
   }
 }, setStatus);
 
 async function connect() {
+  generation++;
+  queue.length = 0;
   clearInterval(demoTimer);
   demoTimer = null;
   const button = byId("connect-button");
@@ -75,6 +89,7 @@ async function connect() {
   button.textContent = "Conectando...";
   try {
     await client.connect(base, token);
+    clearTimeline();
     sessionStorage.setItem("gitviz-token", token);
     localStorage.setItem("gitviz-agent", base);
   } catch (error) {
@@ -90,14 +105,15 @@ async function connect() {
 }
 
 function startDemo() {
+  clearTimeline();
+  generation++;
+  queue.length = 0;
   client.disconnect();
   clearInterval(demoTimer);
   setStatus("demo");
   demo = freshDemo();
   currentSnapshot = demo;
-  renderScene(demo);
-  renderGraph(demo);
-  renderPullRequests(demo);
+  renderSnapshot(demo);
   let step = 0;
   const next = () => {
     if (step >= demoSteps.length) {
@@ -114,6 +130,7 @@ function startDemo() {
         explanation: item.explanation,
         command: item.command,
         ts: new Date().toISOString(),
+        demo: true,
       },
       structuredClone(demo),
     );
@@ -136,8 +153,14 @@ byId("debug-button").addEventListener("click", () => {
 byId("agent-url").value =
   localStorage.getItem("gitviz-agent") || byId("agent-url").value;
 byId("pair-token").value = sessionStorage.getItem("gitviz-token") || "";
-renderScene(demo);
-renderGraph(demo);
-renderPullRequests(demo);
-setStatus("demo");
+setupGuide();
+currentSnapshot = {
+  files: [],
+  branches: [],
+  commits: [],
+  remotes: [],
+  github: { prs: [] },
+};
+renderSnapshot(currentSnapshot);
+setStatus("disconnected");
 if (byId("pair-token").value) void connect();

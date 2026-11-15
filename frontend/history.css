@@ -1,0 +1,91 @@
+.history-list {
+  min-height: 240px;
+  max-height: 420px;
+  overflow: auto;
+}
+.history-row {
+  display: grid;
+  grid-template-columns: 28px 62px minmax(100px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 12px;
+  border-bottom: 1px solid #272a2f;
+  font-size: 11px;
+}
+.history-row.is-head {
+  background: #11192c;
+}
+.history-line {
+  align-self: stretch;
+  position: relative;
+}
+.history-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 11px;
+  width: 1px;
+  background: #397aff;
+}
+.history-line::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: calc(50% - 4px);
+  width: 7px;
+  height: 7px;
+  border: 1px solid #4784ff;
+  background: #11151b;
+  border-radius: 50%;
+}
+.commit-hash {
+  font: 10px var(--mono);
+  color: var(--blue);
+}
+.commit-subject {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.commit-refs {
+  display: flex;
+  gap: 4px;
+  max-width: 180px;
+  overflow: hidden;
+}
+.commit-refs span {
+  font: 9px var(--mono);
+  border: 1px solid #365686;
+  padding: 1px 4px;
+  color: var(--blue);
+  white-space: nowrap;
+}
+.graph-scroll {
+  overflow: auto;
+  border-top: 1px solid var(--line);
+}
+#commit-graph {
+  height: 130px;
+  display: block;
+}
+#commit-graph line {
+  stroke: #376ed0;
+  stroke-width: 2;
+}
+#commit-graph circle {
+  fill: #141618;
+  stroke: #6493ff;
+  stroke-width: 2;
+}
+#commit-graph circle.head {
+  fill: #6394ff;
+}
+#commit-graph text {
+  fill: #92969f;
+  font: 9px var(--mono);
+}
+#commit-graph .ref-label {
+  fill: #a6c2ff;
+}

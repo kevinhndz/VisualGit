@@ -1,0 +1,80 @@
+.pull-requests {
+  max-height: 340px;
+  overflow: auto;
+}
+.pr-card {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.pr-head {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  font-size: 11px;
+}
+.pr-head strong {
+  font-weight: 500;
+}
+.pr-head small {
+  color: var(--green);
+  font: 9px var(--mono);
+}
+.pr-state {
+  font: 10px/1.8 var(--mono);
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+.terminal-panel {
+  margin: 0 18px 16px;
+}
+.terminal-panel .panel-heading {
+  background: #181a1d;
+}
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 10px 14px;
+  max-height: 220px;
+  min-height: 90px;
+  overflow: auto;
+  font-family: var(--mono);
+  background: #0c0e10;
+}
+.timeline li {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 2px 12px;
+  padding: 5px 0;
+  font-size: 11px;
+}
+.when {
+  color: #727984;
+  font-size: 10px;
+}
+.command {
+  color: #b6c6e2;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.command::before {
+  content: "$ ";
+  color: var(--green);
+}
+.explanation {
+  grid-column: 2;
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+.timeline li.error .command {
+  color: var(--red);
+}
+.terminal-hint {
+  margin: 0;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--muted);
+}

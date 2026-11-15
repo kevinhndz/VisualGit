@@ -1,7 +1,16 @@
 const byId = (id) => document.getElementById(id);
 let eventCount = 0;
 
+export function clearTimeline() {
+  eventCount = 0;
+  byId("timeline").replaceChildren();
+  byId("event-count").textContent = "0";
+  byId("activity-count").textContent = "0";
+  byId("timeline-empty").hidden = false;
+}
+
 export function addTimeline(event) {
+  document.getElementById("timeline-empty").hidden = true;
   const row = document.createElement("li");
   row.className =
     event.type === "error" ? "error" : event.pending ? "working" : "";

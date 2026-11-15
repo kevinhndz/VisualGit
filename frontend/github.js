@@ -4,6 +4,7 @@ export function renderPullRequests(snapshot) {
   const host = byId("pull-requests");
   host.replaceChildren();
   const prs = snapshot.github?.prs || [];
+  byId("pr-count").textContent = prs.length;
   if (!prs.length) {
     const empty = document.createElement("p");
     empty.className = "empty";

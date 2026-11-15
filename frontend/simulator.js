@@ -79,6 +79,8 @@ export const demoSteps = [
             number: 1,
             title: "Nueva pagina",
             state: "OPEN",
+            headRefName: "feature/pagina",
+            baseRefName: "main",
             reviewDecision: "REVIEW_REQUIRED",
             mergeStateStatus: "BLOCKED",
             checks: [{ name: "Unit tests", status: "IN_PROGRESS" }],

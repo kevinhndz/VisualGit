@@ -1,0 +1,115 @@
+@media (min-width: 1700px) {
+  .zone img {
+    height: 175px;
+  }
+  .dashboard {
+    grid-template-columns: 300px minmax(400px, 1fr) 310px;
+  }
+  .history-list {
+    min-height: 300px;
+  }
+}
+@media (max-width: 1200px) {
+  .topbar {
+    flex-wrap: wrap;
+  }
+  .top-actions {
+    margin-left: 0;
+  }
+  .zone {
+    padding: 8px;
+  }
+  .zone h2 {
+    font-size: 10px;
+  }
+  .zone img {
+    height: 110px;
+  }
+  .dashboard {
+    grid-template-columns: 230px minmax(260px, 1fr);
+  }
+  .dashboard > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 800px) {
+  .scene {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .command-path {
+    grid-template-columns: repeat(3, 1fr);
+    padding: 10px 0;
+  }
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+  .narration {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .connection-fields {
+    grid-template-columns: 1fr;
+  }
+  .guide-controls {
+    flex-wrap: wrap;
+  }
+  .history-row {
+    grid-template-columns: 16px 56px minmax(100px, 1fr);
+    gap: 7px;
+  }
+  .commit-refs {
+    grid-column: 3;
+    padding-bottom: 6px;
+  }
+}
+@media (max-width: 450px) {
+  .scene {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .pipeline-wrap {
+    padding: 12px 10px 0;
+  }
+  .dashboard {
+    padding: 12px 10px;
+  }
+  .terminal-panel,
+  .connection-panel {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .topbar {
+    padding: 10px;
+  }
+}
+body.presentation .topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+}
+body.presentation .dashboard {
+  grid-template-columns: 280px minmax(300px, 1fr) 290px;
+}
+body.presentation .zone img {
+  height: 200px;
+}
+body.presentation .zone h2 {
+  font-size: 14px;
+}
+body.presentation .connection-panel {
+  display: none;
+}
+@media (max-width: 1000px) {
+  body.presentation .dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

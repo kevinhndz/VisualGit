@@ -8,7 +8,7 @@ function quantile(values, p) {
 }
 
 export function showLatency(event) {
-  if (!event.ts || demoTimer) return;
+  if (!event.ts || event.demo) return;
   const delay = Math.max(0, Date.now() - Date.parse(event.ts));
   if (!Number.isFinite(delay)) return;
   latencies.push(delay);

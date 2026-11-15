@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="stage-illustration" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 170 110">
+
+<ellipse cx="85" cy="94" rx="55" ry="8" stroke="#434655" stroke-width="1.5"></ellipse>
+
+<path d="M 28 80 C 28 80, 85 86, 142 80 L 140 85 C 140 85, 85 91, 30 85 Z" fill="#202327" stroke="#8D90A0" stroke-width="2"></path>
+
+<path d="M 24 81 Q 20 83 24 85" stroke="#C7C6C6" stroke-width="2"></path>
+<path d="M 146 81 Q 150 83 146 85" stroke="#C7C6C6" stroke-width="2"></path>
+
+<ellipse cx="85" cy="74" fill="#181A1D" rx="42" ry="12" stroke="#3B82F6" stroke-width="2"></ellipse>
+<ellipse cx="85" cy="74" rx="32" ry="8" stroke="#2563EB" stroke-dasharray="3 2" stroke-width="1.5"></ellipse>
+
+<g transform="translate(68, 50)">
+<rect fill="#15181E" height="24" rx="2" stroke="#3B82F6" stroke-width="2" width="34" x="0" y="0"></rect>
+<path d="M 24 0 L 34 10 L 24 10 Z" fill="#2563EB"></path>
+<line stroke="#93C5FD" stroke-width="1.5" x1="5" x2="19" y1="8" y2="8"></line>
+<line stroke="#93C5FD" stroke-width="1.2" x1="5" x2="27" y1="14" y2="14"></line>
+<circle cx="26" cy="18" fill="#22C55E" r="2.5"></circle>
+</g>
+
+
+</svg>

@@ -3,106 +3,181 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#090d18" />
-    <title>Git Visual · Git en movimiento</title>
+    <meta name="theme-color" content="#0f1011" />
+    <title>Git Visual · Tu terminal en movimiento</title>
     <link rel="stylesheet" href="./styles.css" />
     <script type="module" src="./app.js"></script>
   </head>
   <body>
     <header class="topbar">
-      <div class="brand">
-        <span class="brand-mark">⎇</span>
-        <div>
-          <strong>Git Visual</strong
-          ><small>Tu repositorio, en movimiento</small>
-        </div>
+      <strong class="brand"><span aria-hidden="true">⑂</span>Git Visual</strong>
+      <div class="repo-context">
+        <span id="repo-title" class="chip">Sin repositorio conectado</span>
+        <span id="branch-chip" class="chip">HEAD</span>
       </div>
       <div class="live-status">
-        <span id="connection-dot" class="status-dot"></span
-        ><span id="connection-label">Modo demostracion</span
-        ><span id="latency-label" class="latency"></span>
+        <span id="connection-dot" class="status-dot disconnected"></span>
+        <span id="connection-label">Sin conexion</span>
+        <span id="latency-label" class="latency"></span>
       </div>
-      <button id="presentation-button" class="button quiet" type="button">
-        ◱ Presentacion
-      </button>
+      <div class="top-actions">
+        <div class="guide-controls">
+          <button id="guide-prev" type="button" aria-label="Escena anterior">
+            Anterior
+          </button>
+          <span id="guide-label" class="guide-label">Vista en vivo</span>
+          <button id="guide-next" type="button" aria-label="Escena siguiente">
+            Siguiente
+          </button>
+          <button id="live-button" type="button" hidden>Volver en vivo</button>
+        </div>
+        <button id="presentation-button" type="button">Presentacion</button>
+      </div>
     </header>
 
-    <main class="layout">
-      <section class="workspace" aria-label="Escena visual de Git">
-        <div class="workspace-heading">
-          <div>
-            <p class="eyebrow">MAPA DEL REPOSITORIO</p>
-            <h1 id="repo-title">Asi viajan tus cambios</h1>
-          </div>
-          <span id="branch-chip" class="branch-chip">HEAD → main</span>
-        </div>
+    <main class="workspace">
+      <div id="narration" class="narration" role="status" aria-live="polite">
+        <strong id="narration-title">Tu terminal, en movimiento</strong>
+        <p id="narration-text">
+          Conecta el agente para observar tu repositorio.
+        </p>
+      </div>
+      <section class="pipeline-wrap" aria-label="Recorrido visual de Git">
         <div id="scene" class="scene">
-          <div class="world-label local-label">TU COMPUTADORA</div>
-          <div class="world-label remote-label">GITHUB</div>
-          <svg
-            class="connections"
-            viewBox="0 0 1200 600"
-            preserveAspectRatio="none"
-            aria-hidden="true"
+          <article
+            id="working-zone"
+            class="zone working-zone"
+            tabindex="0"
+            data-stage="0"
           >
-            <path id="path-add" d="M250 236 C300 236 315 236 365 236" />
-            <path id="path-commit" d="M575 236 C620 236 625 236 670 236" />
-            <path id="path-push" d="M880 226 C925 226 935 226 980 226" />
-            <path id="path-pull" d="M980 265 C940 265 925 265 880 265" />
-          </svg>
-          <div id="working-zone" class="zone working-zone">
-            <div class="zone-icon">▣</div>
-            <p class="zone-kicker">01 · EN TU CARPETA</p>
-            <h2>Archivos</h2>
-            <p class="zone-description">
-              Lo que editas con nano, VS Code o la terminal.
-            </p>
-            <div id="working-files" class="file-list"></div>
-          </div>
-          <div id="stage-zone" class="zone stage-zone">
-            <div class="zone-icon">▤</div>
-            <p class="zone-kicker">02 · LISTO PARA GUARDAR</p>
-            <h2>Bandeja stage</h2>
-            <p class="zone-description">Cambios elegidos con git add.</p>
-            <div id="staged-files" class="file-list"></div>
-          </div>
-          <div id="repo-zone" class="zone repo-zone">
-            <div class="zone-icon">▥</div>
-            <p class="zone-kicker">03 · HISTORIAL LOCAL</p>
-            <h2>Cuadernos</h2>
-            <p class="zone-description">Cada rama tiene sus hojas y commits.</p>
-            <div id="notebooks" class="notebooks"></div>
-          </div>
-          <div id="cloud-zone" class="zone cloud-zone">
-            <div class="zone-icon">☁</div>
-            <p class="zone-kicker">04 · EN GITHUB</p>
-            <h2>La nube</h2>
-            <p class="zone-description">Ramas remotas y colaboracion.</p>
-            <div id="remote-branches" class="remote-list"></div>
-          </div>
-          <div class="review-row">
-            <div id="robot" class="actor robot">
-              <span class="actor-emoji">🤖</span>
-              <div>
-                <strong>Robot de CI</strong
-                ><small id="ci-status">Esperando un Pull Request</small>
-              </div>
+            <h2>1. Directorio local</h2>
+            <p class="zone-kicker">codigo en tu computadora</p>
+            <img
+              src="./images/computer.svg"
+              alt="Escritorio con computadora y archivos"
+            />
+            <div class="zone-summary">
+              <strong id="working-summary">Sin conexion</strong
+              ><small>archivos sin preparar</small>
             </div>
-            <div class="review-arrow">→</div>
-            <div id="host" class="actor host">
-              <span class="actor-emoji">🧑‍⚖</span>
-              <div>
-                <strong>Mediador de GitHub</strong
-                ><small id="review-status">Revisa checks y aprobaciones</small>
-              </div>
+          </article>
+          <article
+            id="stage-zone"
+            class="zone stage-zone"
+            tabindex="0"
+            data-stage="1"
+          >
+            <h2>2. Staging (bandeja)</h2>
+            <p class="zone-kicker">cambios seleccionados</p>
+            <img
+              src="./images/tray.svg"
+              alt="Bandeja y plato con un archivo preparado"
+            />
+            <div class="zone-summary">
+              <strong id="stage-summary">Sin conexion</strong
+              ><small>listos para commit</small>
             </div>
-          </div>
+          </article>
+          <article
+            id="repo-zone"
+            class="zone repo-zone"
+            tabindex="0"
+            data-stage="2"
+          >
+            <h2>3. Repositorio local</h2>
+            <p class="zone-kicker">historial en .git</p>
+            <img
+              src="./images/repository.svg"
+              alt="Archivador para los commits locales"
+            />
+            <div class="zone-summary">
+              <strong id="repo-summary">Sin commits</strong
+              ><small>guardado en tu disco</small>
+            </div>
+          </article>
+          <article
+            id="cloud-zone"
+            class="zone cloud-zone"
+            tabindex="0"
+            data-stage="3"
+          >
+            <h2>4. Remoto GitHub</h2>
+            <p class="zone-kicker">ramas de tu equipo</p>
+            <img src="./images/cloud.svg" alt="Nube con repositorio remoto" />
+            <div class="zone-summary">
+              <strong id="remote-summary">Sin remoto</strong
+              ><small>referencias conocidas localmente</small>
+            </div>
+          </article>
+          <article id="checks-zone" class="zone" tabindex="0" data-stage="4">
+            <h2>5. PR y CI checks</h2>
+            <p class="zone-kicker">robot y revision</p>
+            <img
+              src="./images/checks.svg"
+              alt="Robot revisando una lista de pruebas"
+            />
+            <div class="zone-summary">
+              <strong id="checks-summary">Sin checks</strong
+              ><small>resultado informado por GitHub</small>
+            </div>
+          </article>
+          <article id="delivery-zone" class="zone" tabindex="0" data-stage="5">
+            <h2>6. Integracion</h2>
+            <p class="zone-kicker">merge y entrega</p>
+            <img
+              src="./images/delivery.svg"
+              alt="Bandeja de entrega del trabajo integrado"
+            />
+            <div class="zone-summary">
+              <strong id="delivery-summary">Sin integraciones</strong
+              ><small id="delivery-detail">despliegue segun tu pipeline</small>
+            </div>
+          </article>
           <div id="motion-layer" class="motion-layer" aria-hidden="true"></div>
         </div>
-        <section class="graph-panel" aria-label="Grafo de commits">
-          <div class="graph-heading">
-            <strong>Grafo real de commits</strong
-            ><span>HEAD, ramas y hashes</span>
+        <nav class="command-path" aria-label="Explorar conceptos de Git">
+          <button type="button" data-stage="1">git add →</button>
+          <button type="button" data-stage="2">git commit →</button>
+          <button type="button" data-stage="3">git push →</button>
+          <button type="button" data-stage="4">gh pr create →</button>
+          <button type="button" data-stage="5">merge y entrega →</button>
+        </nav>
+      </section>
+
+      <section class="dashboard" aria-label="Estado del repositorio">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>
+              Archivos de trabajo
+              <span id="working-count" class="count">0</span>
+            </h2>
+          </div>
+          <div id="working-files" class="file-list"></div>
+          <div class="panel-heading subheading">
+            <h2>
+              Archivos en staging <span id="stage-count" class="count">0</span>
+            </h2>
+          </div>
+          <div id="staged-files" class="file-list"></div>
+          <div class="panel-heading subheading"><h2>Ramas locales</h2></div>
+          <div id="notebooks" class="branch-list"></div>
+          <div id="remote-branches" class="remote-list"></div>
+          <p class="help-inline">
+            Trabaja desde tu terminal. Cada cambio aparece aqui automaticamente.
+          </p>
+        </section>
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>
+              Historial de commits
+              <span id="commit-count" class="count">0</span>
+            </h2>
+            <small id="history-branch">HEAD</small>
+          </div>
+          <div id="commit-history" class="history-list"></div>
+          <div class="panel-heading subheading">
+            <h2>Grafo de ramas</h2>
+            <small>hasta 18 commits</small>
           </div>
           <div class="graph-scroll">
             <svg
@@ -112,90 +187,84 @@
             ></svg>
           </div>
         </section>
-        <div id="narration" class="narration" role="status" aria-live="polite">
-          <span class="narration-icon">✦</span>
-          <div>
-            <strong id="narration-title">Listo para observar</strong>
-            <p id="narration-text">
-              Conecta el agente para ver tus comandos reales.
-            </p>
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>Pull Requests <span id="pr-count" class="count">0</span></h2>
+            <small>GitHub</small>
           </div>
-        </div>
+          <div id="pull-requests" class="pull-requests"></div>
+          <div class="panel-heading subheading">
+            <h2>Estado de CI y revision</h2>
+          </div>
+          <div id="robot" class="actor robot">
+            <strong>Robot de CI</strong
+            ><small id="ci-status">Esperando un Pull Request</small>
+          </div>
+          <div id="host" class="actor host">
+            <strong>Mediador de GitHub</strong
+            ><small id="review-status">Esperando revision</small>
+          </div>
+        </section>
       </section>
 
-      <aside class="sidebar">
-        <section class="panel connection-panel">
-          <div class="panel-title">
-            <div>
-              <p class="eyebrow">CONEXION</p>
-              <h2>Agente local</h2>
-            </div>
-            <span class="panel-sigil">⌁</span>
-          </div>
-          <p class="help">
-            Inicia <code>./install.sh</code> en el repositorio que quieres
-            mostrar. Despues pega el codigo que aparece en la terminal.
-          </p>
-          <label for="agent-url">Direccion del agente</label
-          ><input
-            id="agent-url"
-            type="url"
-            value="http://127.0.0.1:43721"
-            spellcheck="false"
-          /><label for="pair-token">Codigo de emparejamiento</label>
-          <div class="connect-row">
-            <input
+      <section
+        class="panel terminal-panel"
+        aria-label="Actividad de tu terminal"
+      >
+        <div class="panel-heading">
+          <h2>
+            Terminal · actividad observada
+            <span id="activity-count" class="count">0</span>
+          </h2>
+          <small>en tiempo real</small>
+        </div>
+        <ol id="timeline" class="timeline" aria-live="polite"></ol>
+        <p id="timeline-empty" class="terminal-hint">
+          Ejecuta un comando Git en la carpeta observada para verlo aqui.
+        </p>
+      </section>
+
+      <details id="connection-panel" class="panel connection-panel" open>
+        <summary>Conexion con tu terminal</summary>
+        <p class="connection-help">
+          Desde la carpeta de tu proyecto ejecuta <code>gitviz start</code>.
+          Copia su codigo y conecta aqui. Si ya observabas otra carpeta, ejecuta
+          <code>gitviz stop</code> antes.
+        </p>
+        <div class="connection-fields">
+          <label for="agent-url"
+            >Direccion del agente<input
+              id="agent-url"
+              type="url"
+              value="http://127.0.0.1:43721"
+              spellcheck="false"
+          /></label>
+          <label for="pair-token"
+            >Codigo de emparejamiento<input
               id="pair-token"
               type="password"
               autocomplete="off"
-              placeholder="Pega el codigo aqui"
-            /><button id="connect-button" class="button primary" type="button">
-              Conectar
-            </button>
-          </div>
-          <p id="connect-error" class="form-error" role="alert"></p>
-          <div class="mode-row">
-            <button id="demo-button" class="button quiet" type="button">
-              Ver demostracion</button
-            ><button id="debug-button" class="button quiet" type="button">
-              Depuracion ▾
-            </button>
-          </div>
-          <div id="debug-panel" class="debug-panel" hidden>
-            <span>Eventos: <b id="event-count">0</b></span
-            ><span>Latencia p50: <b id="latency-p50">—</b></span
-            ><span>Latencia p95: <b id="latency-p95">—</b></span>
-          </div>
-        </section>
-        <section class="panel activity-panel">
-          <div class="panel-title">
-            <div>
-              <p class="eyebrow">EN TIEMPO REAL</p>
-              <h2>Linea de tiempo</h2>
-            </div>
-            <span id="activity-count" class="count">0</span>
-          </div>
-          <ol id="timeline" class="timeline" aria-live="polite"></ol>
-        </section>
-        <section class="panel github-panel">
-          <div class="panel-title">
-            <div>
-              <p class="eyebrow">COLABORACION</p>
-              <h2>Pull Requests</h2>
-            </div>
-            <span class="panel-sigil purple">⑂</span>
-          </div>
-          <div id="pull-requests" class="pull-requests">
-            <p class="empty">
-              Los PR reales apareceran aqui cuando el agente consulte GitHub.
-            </p>
-          </div>
-        </section>
-      </aside>
+              placeholder="Pega el codigo de tu terminal"
+          /></label>
+          <button id="connect-button" class="primary" type="button">
+            Conectar
+          </button>
+        </div>
+        <p id="connect-error" class="form-error" role="alert"></p>
+        <div class="mode-row">
+          <button id="demo-button" type="button">Ver demostracion</button
+          ><button id="debug-button" type="button">Ver metricas</button>
+        </div>
+        <div id="debug-panel" class="debug-panel" hidden>
+          <span>Eventos: <b id="event-count">0</b></span
+          ><span>Latencia p50: <b id="latency-p50">—</b></span
+          ><span>Latencia p95: <b id="latency-p95">—</b></span>
+        </div>
+      </details>
     </main>
     <footer>
-      Git Visual muestra nombres, hashes y estados. Nunca ensena el contenido de
-      tus archivos.
+      Git Visual · Nombres, hashes y estados de tu repositorio. El contenido de
+      tus archivos permanece en tu computadora.
     </footer>
   </body>
 </html>

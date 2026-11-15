@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="stage-illustration" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 170 110">
+
+<rect fill="#181A1D" height="60" rx="3" stroke="#8D90A0" stroke-width="2" width="46" x="18" y="24"></rect>
+<rect fill="#30343C" height="6" rx="1.5" stroke="#C7C6C6" stroke-width="1.5" width="14" x="34" y="20"></rect>
+
+<line stroke="#C7C6C6" stroke-width="1.5" x1="26" x2="52" y1="36" y2="36"></line>
+<polyline points="26 46 29 49 35 43" stroke="#22C55E" stroke-width="1.8"></polyline>
+<line stroke="#8D90A0" stroke-width="1.2" x1="38" x2="54" y1="46" y2="46"></line>
+<polyline points="26 58 29 61 35 55" stroke="#22C55E" stroke-width="1.8"></polyline>
+<line stroke="#8D90A0" stroke-width="1.2" x1="38" x2="54" y1="58" y2="58"></line>
+
+<rect fill="#22C55E" fill-opacity="0.15" height="12" rx="2" stroke="#22C55E" stroke-width="1.2" width="34" x="24" y="66"></rect>
+
+
+<line stroke="#434655" stroke-width="3" x1="74" x2="152" y1="84" y2="84"></line>
+<circle cx="82" cy="88" r="3" stroke="#8D90A0" stroke-width="1.5"></circle>
+<circle cx="112" cy="88" r="3" stroke="#8D90A0" stroke-width="1.5"></circle>
+<circle cx="144" cy="88" r="3" stroke="#8D90A0" stroke-width="1.5"></circle>
+
+<rect fill="#1F2021" height="24" rx="3" stroke="#A5C4B4" stroke-width="2" width="26" x="110" y="32"></rect>
+
+<line stroke="#A5C4B4" stroke-width="1.5" x1="123" x2="123" y1="32" y2="24"></line>
+<circle cx="123" cy="23" fill="#22C55E" r="2"></circle>
+
+<rect fill="#0F1011" height="6" rx="2" width="18" x="114" y="38"></rect>
+<circle cx="119" cy="41" fill="#22C55E" r="1.5"></circle>
+<circle cx="127" cy="41" fill="#22C55E" r="1.5"></circle>
+
+<rect fill="#181A1D" height="20" rx="2" stroke="#A5C4B4" stroke-width="1.5" width="20" x="113" y="58"></rect>
+
+<rect fill="#202327" height="14" rx="1.5" stroke="#22C55E" stroke-width="1.2" width="18" x="74" y="66"></rect>
+<polyline points="79 73 82 76 88 70" stroke="#22C55E" stroke-width="1.5"></polyline>
+</svg>
