@@ -1,0 +1,32 @@
+<svg class="stage-illustration" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 170 110">
+
+<line stroke="#434655" stroke-width="2" x1="12" x2="158" y1="88" y2="88"></line>
+<line stroke="#434655" stroke-width="2" x1="26" x2="26" y1="88" y2="104"></line>
+<line stroke="#434655" stroke-width="2" x1="144" x2="144" y1="88" y2="104"></line>
+
+<path d="M 28 88 L 34 50 L 52 46" stroke="#C7C6C6" stroke-width="2"></path>
+<path d="M 48 40 L 60 48 L 50 56 Z" fill="#30343C" stroke="#C7C6C6" stroke-width="2"></path>
+
+<path d="M 58 52 L 80 84" stroke="#EAD7BA" stroke-dasharray="2 3" stroke-width="1.5"></path>
+
+<rect fill="#181A1D" height="34" rx="2" stroke="#8D90A0" stroke-width="2" width="46" x="58" y="44"></rect>
+<line stroke="#2563EB" stroke-width="1.5" x1="64" x2="88" y1="52" y2="52"></line>
+<line stroke="#A5C4B4" stroke-width="1.5" x1="64" x2="96" y1="58" y2="58"></line>
+<line stroke="#8D90A0" stroke-width="1.5" x1="64" x2="80" y1="64" y2="64"></line>
+
+<path d="M 52 78 L 110 78 L 106 82 L 56 82 Z" fill="#343536" stroke="#8D90A0" stroke-width="1.5"></path>
+
+
+<g transform="translate(108, 62) rotate(6)">
+<rect fill="#1F2021" height="22" rx="1.5" stroke="#EF4444" stroke-width="1.5" width="34" x="0" y="0"></rect>
+<line stroke="#C7C6C6" stroke-width="1.2" x1="4" x2="26" y1="6" y2="6"></line>
+<line stroke="#8D90A0" stroke-width="1" x1="4" x2="18" y1="12" y2="12"></line>
+<circle cx="28" cy="15" fill="#EF4444" r="2"></circle>
+</g>
+
+<g transform="translate(98, 70) rotate(-4)">
+<rect fill="#181A1D" height="20" rx="1.5" stroke="#F59E0B" stroke-width="1.5" width="34" x="0" y="0"></rect>
+<line stroke="#E3E4E8" stroke-width="1.2" x1="4" x2="22" y1="6" y2="6"></line>
+<line stroke="#8D90A0" stroke-width="1" x1="4" x2="16" y1="11"></line>
+</g>
+</svg>
