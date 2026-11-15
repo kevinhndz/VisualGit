@@ -12,5 +12,8 @@
     "status": "node agent/cli.mjs status",
     "test": "node --test agent/test/*.test.mjs",
     "format:check": "npx prettier --check frontend agent package.json README.md"
+  },
+  "devDependencies": {
+    "prettier": "3.5.3"
   }
 }
