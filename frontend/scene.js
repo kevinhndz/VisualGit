@@ -1,13 +1,14 @@
+import { selectStage, eventStage } from "./guide.js";
 const byId = (id) => document.getElementById(id);
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
-  if (className) node.className = className;
+  node.className = className;
   if (text !== undefined) node.textContent = text;
   return node;
 }
 
-function replaceList(id, items, emptyText, limit = 6) {
+function replaceList(id, items, emptyText, limit = 30) {
   const host = byId(id);
   host.replaceChildren();
   if (!items.length) host.append(element("p", "empty", emptyText));
@@ -16,7 +17,7 @@ function replaceList(id, items, emptyText, limit = 6) {
     host.append(element("span", "more", `+${items.length - limit} mas`));
 }
 
-function filePill(file, staged = false) {
+function fileRow(file, staged = false) {
   const status = staged
     ? "staged"
     : file.work === "D"
@@ -24,207 +25,184 @@ function filePill(file, staged = false) {
       : file.index === "?"
         ? "untracked"
         : "modified";
-  const node = element("div", `file-pill ${status}`);
-  node.title = file.path;
-  node.append(element("span", "file-icon", status === "deleted" ? "✕" : "▤"));
-  node.append(element("span", "file-name", file.path));
-  const count =
-    file.added || file.deleted
-      ? `+${file.added || 0} −${file.deleted || 0}`
-      : status === "untracked"
-        ? "nuevo"
-        : status === "deleted"
-          ? "borrado"
-          : "";
-  node.append(element("span", "file-detail", count));
-  return node;
-}
-
-function branchBook(branch, snapshot) {
-  const node = element(
-    "div",
-    `notebook${branch.name === snapshot.branch ? " current" : ""}`,
-  );
-  const title = element("div", "book-name");
-  title.append(element("span", "", branch.name));
-  if (branch.name === snapshot.branch)
-    title.append(element("span", "", "HEAD"));
-  node.append(title);
-  const commit = snapshot.commits?.find((item) => item.hash === branch.hash);
-  node.append(
+  const row = element("div", `file-pill ${status}`);
+  row.title = file.path;
+  const label = element("div", "file-label");
+  const split = file.path.lastIndexOf("/");
+  label.append(element("span", "file-name", file.path.slice(split + 1)));
+  label.append(
     element(
-      "small",
-      "",
-      branch.hash
-        ? `${branch.hash.slice(0, 7)} · ${commit?.subject || "commit"}`
-        : "Sin commits todavia",
+      "span",
+      "file-directory",
+      split < 0 ? "./" : file.path.slice(0, split + 1),
     ),
   );
-  const pages = element("div", "book-pages");
-  const byHash = new Map(
-    (snapshot.commits || []).map((item) => [item.hash, item]),
+  row.append(
+    label,
+    element(
+      "span",
+      "file-detail",
+      file.added || file.deleted
+        ? `+${file.added || 0} -${file.deleted || 0}`
+        : staged
+          ? "STAGED"
+          : status === "untracked"
+            ? "NUEVO"
+            : status === "deleted"
+              ? "BORRADO"
+              : "MODIFICADO",
+    ),
   );
-  let hash = branch.hash;
-  let total = 0;
-  while (hash && byHash.has(hash) && total < 8) {
-    total++;
-    hash = byHash.get(hash).parents?.[0];
-  }
-  for (let i = 0; i < Math.min(total, 8); i++) pages.append(element("i"));
-  node.append(pages);
-  return node;
+  return row;
 }
 
 function updateReview(snapshot) {
-  const robot = byId("robot");
-  const host = byId("host");
-  robot.className = "actor robot";
-  host.className = "actor host";
-  const pr = snapshot.github?.prs?.find((item) => item.state === "OPEN");
-  if (!pr) {
-    byId("ci-status").textContent = "Esperando un Pull Request";
-    byId("review-status").textContent = "Revisa checks y aprobaciones";
-    return;
-  }
-  const checks = pr.checks || [];
-  const failed = checks.some(
-    (check) =>
-      check.conclusion === "FAILURE" || check.conclusion === "CANCELLED",
+  const prs = snapshot.github?.prs || [];
+  const pr = prs.find((item) => item.state === "OPEN");
+  const checks = pr?.checks || [];
+  const failed = checks.some((check) =>
+    ["FAILURE", "CANCELLED", "TIMED_OUT", "ACTION_REQUIRED", "ERROR"].includes(
+      check.conclusion,
+    ),
   );
   const pending = checks.some((check) => check.status !== "COMPLETED");
-  robot.classList.add(failed ? "failed" : pending ? "working" : "ready");
-  byId("ci-status").textContent = failed
-    ? "Pruebas fallidas"
-    : pending
-      ? `${checks.length} checks en marcha`
-      : checks.length
-        ? `${checks.length} checks terminados`
-        : "Sin checks informados";
-  const approved = pr.reviewDecision === "APPROVED";
-  const mergeable = pr.mergeStateStatus === "CLEAN";
-  host.classList.add(
-    approved && mergeable && !failed && !pending ? "ready" : "working",
-  );
-  byId("review-status").textContent =
-    approved && mergeable && !failed && !pending
-      ? "Aprobado para fusionar"
-      : pr.mergeStateStatus === "DIRTY"
-        ? "Conflictos pendientes"
-        : approved
-          ? "Esperando checks"
-          : "Esperando revision";
+  const passed = checks.filter(
+    (check) => check.conclusion === "SUCCESS",
+  ).length;
+  const approved = pr?.reviewDecision === "APPROVED";
+  byId("robot").className =
+    `actor robot ${failed ? "failed" : pending ? "working" : checks.length ? "ready" : ""}`;
+  byId("ci-status").textContent = !pr
+    ? "Sin PR abierto"
+    : failed
+      ? "Hay checks fallidos"
+      : pending
+        ? "Checks en ejecucion"
+        : checks.length
+          ? `${passed}/${checks.length} checks aprobados`
+          : "Sin checks informados";
+  byId("checks-summary").textContent = pr
+    ? byId("ci-status").textContent
+    : "Sin checks activos";
+  byId("host").className =
+    `actor host ${pr?.mergeStateStatus === "DIRTY" ? "failed" : approved ? "ready" : ""}`;
+  byId("review-status").textContent = !pr
+    ? "Sin revision pendiente"
+    : pr.mergeStateStatus === "DIRTY"
+      ? "Conflictos pendientes"
+      : approved
+        ? "Revision aprobada"
+        : "Esperando revision";
+  const merged = prs.filter((item) => item.state === "MERGED").length;
+  byId("delivery-summary").textContent = merged
+    ? `${merged} PR integrados`
+    : "Sin integraciones informadas";
+  byId("delivery-detail").textContent =
+    "Despliegue no verificado por el agente";
 }
 
 export function renderScene(snapshot) {
   if (!snapshot) return;
-  byId("repo-title").textContent = snapshot.repo || "Repositorio";
+  byId("repo-title").textContent = snapshot.repo || "Sin repositorio conectado";
   byId("branch-chip").textContent = `HEAD → ${snapshot.branch || "sin rama"}`;
   const files = snapshot.files || [];
+  const working = files.filter(
+    (file) => file.index === "?" || file.work !== ".",
+  );
+  const staged = files.filter(
+    (file) => file.index !== "." && file.index !== "?",
+  );
   replaceList(
     "working-files",
-    files
-      .filter((file) => file.index === "?" || file.work !== ".")
-      .map((file) => filePill(file)),
+    working.map((file) => fileRow(file)),
     "Sin cambios en la carpeta",
   );
   replaceList(
     "staged-files",
-    files
-      .filter((file) => file.index !== "." && file.index !== "?")
-      .map((file) => filePill(file, true)),
+    staged.map((file) => fileRow(file, true)),
     "La bandeja esta vacia",
   );
-  const branches = snapshot.branches?.length
-    ? snapshot.branches
-    : [{ name: snapshot.branch || "main", hash: snapshot.head }];
+  byId("working-count").textContent = working.length;
+  byId("stage-count").textContent = staged.length;
+  byId("working-summary").textContent =
+    `${working.length} archivos sin preparar`;
+  byId("stage-summary").textContent = `${staged.length} archivos preparados`;
+  byId("repo-summary").textContent =
+    snapshot.head?.slice(0, 7) || "Sin commits todavia";
+  byId("remote-summary").textContent = snapshot.remotes?.length
+    ? `${snapshot.remotes.length} referencias remotas`
+    : "Sin ramas remotas";
   replaceList(
     "notebooks",
-    branches.map((branch) => branchBook(branch, snapshot)),
+    (snapshot.branches || []).map((branch) => {
+      const chip = element(
+        "span",
+        `chip${branch.name === snapshot.branch ? " current" : ""}`,
+        branch.name,
+      );
+      chip.title = branch.hash || "Sin commits";
+      return chip;
+    }),
     "Aun no hay ramas",
-    7,
   );
   replaceList(
     "remote-branches",
-    (snapshot.remotes || []).map((branch) => {
-      const node = element(
+    (snapshot.remotes || []).map((branch) =>
+      element(
         "div",
         "remote-pill",
-        `⑂ ${branch.name} · ${branch.hash?.slice(0, 7) || "—"}`,
-      );
-      node.title = branch.name;
-      return node;
-    }),
-    "Todavia no hay ramas en origin.",
+        `${branch.name} · ${branch.hash?.slice(0, 7) || ""}`,
+      ),
+    ),
+    "Sin referencias remotas",
   );
   updateReview(snapshot);
 }
 
-const zones = {
-  init: ["working-zone", "repo-zone"],
-  file: ["working-zone"],
-  add: ["working-zone", "stage-zone"],
-  unstage: ["stage-zone", "working-zone"],
-  restore: ["working-zone"],
-  commit: ["stage-zone", "repo-zone"],
-  amend: ["repo-zone"],
-  branch: ["repo-zone"],
-  branch_delete: ["repo-zone"],
-  switch: ["repo-zone", "working-zone"],
-  merge: ["repo-zone"],
-  conflict: ["working-zone", "repo-zone"],
-  rebase: ["repo-zone"],
-  push: ["repo-zone", "cloud-zone"],
-  fetch: ["cloud-zone", "repo-zone"],
-  pull: ["cloud-zone", "repo-zone", "working-zone"],
-  remote: ["cloud-zone"],
-  pr: ["robot", "host"],
-  ci: ["robot"],
-  inspect: ["repo-zone"],
-  generic: ["repo-zone"],
-  error: ["repo-zone"],
-};
-const paths = {
-  add: "path-add",
-  commit: "path-commit",
-  push: "path-push",
-  pull: "path-pull",
-  fetch: "path-pull",
-  unstage: "path-add",
+const flights = {
+  add: [0, 1],
+  unstage: [1, 0],
+  commit: [1, 2],
+  push: [2, 3],
+  fetch: [3, 2],
+  pull: [3, 0],
+  pr: [3, 4],
+  ci: [4, 5],
 };
 
 export function animateEvent(event) {
-  for (const id of zones[event.type] || zones.generic) {
-    const zone = byId(id);
-    zone.classList.remove("impact");
-    void zone.offsetWidth;
-    zone.classList.add("impact");
-    setTimeout(() => zone.classList.remove("impact"), 700);
-  }
-  const path = byId(paths[event.type]);
-  if (path) {
-    path.classList.add("active");
-    setTimeout(() => path.classList.remove("active"), 800);
-  }
-  const flight = {
-    add: "add",
-    commit: "commit",
-    push: "push",
-    pull: "pull",
-    fetch: "pull",
-  }[event.type];
-  if (flight) {
-    const symbol = element(
+  selectStage(eventStage(event.type), false);
+  const cards = [...document.querySelectorAll(".scene .zone")];
+  const route = flights[event.type];
+  if (route && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const layer = byId("motion-layer");
+    const box = layer.getBoundingClientRect();
+    const from = cards[route[0]].getBoundingClientRect();
+    const to = cards[route[1]].getBoundingClientRect();
+    const packet = element(
       "span",
-      `flying-file ${flight}`,
-      event.type === "push" || event.type === "fetch" || event.type === "pull"
-        ? "📦"
-        : "📄",
+      "flying-packet",
+      event.type === "commit" ? "commit" : "cambios",
     );
-    byId("motion-layer").append(symbol);
-    setTimeout(() => symbol.remove(), 750);
+    packet.style.left = `${from.left - box.left + from.width / 2}px`;
+    packet.style.top = `${from.top - box.top + from.height / 2}px`;
+    layer.append(packet);
+    const animation = packet.animate(
+      [
+        { transform: "translate(-50%, -50%)", opacity: 0 },
+        { transform: "translate(-50%, -50%)", opacity: 1, offset: 0.15 },
+        {
+          transform: `translate(${to.left - from.left - packet.offsetWidth / 2}px, ${to.top - from.top - packet.offsetHeight / 2}px)`,
+          opacity: 1,
+        },
+      ],
+      { duration: 650, easing: "ease-in-out" },
+    );
+    animation.onfinish = () => packet.remove();
   }
   byId("narration").classList.toggle("failed", event.type === "error");
-  byId("narration-title").textContent = event.title || "Cambio el repositorio";
+  byId("narration-title").textContent =
+    event.title || "Cambio en el repositorio";
   byId("narration-text").textContent =
-    event.explanation || "El agente actualizo el estado del repositorio.";
+    event.explanation || "Estado actualizado desde tu terminal.";
 }
