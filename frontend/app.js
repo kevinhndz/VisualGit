@@ -3,7 +3,7 @@ import { setupGuide } from "./guide.js";
 import { renderHistory } from "./history.js";
 import { renderGraph } from "./graph.js";
 import { showLatency } from "./metrics.js";
-import { addTimeline } from "./timeline.js";
+import { addTimeline, clearTimeline } from "./timeline.js";
 import { renderPullRequests } from "./github.js";
 import { animateEvent, renderScene } from "./scene.js";
 import { demoSteps, freshDemo } from "./simulator.js";
@@ -89,6 +89,7 @@ async function connect() {
   button.textContent = "Conectando...";
   try {
     await client.connect(base, token);
+    clearTimeline();
     sessionStorage.setItem("gitviz-token", token);
     localStorage.setItem("gitviz-agent", base);
   } catch (error) {
@@ -104,6 +105,7 @@ async function connect() {
 }
 
 function startDemo() {
+  clearTimeline();
   generation++;
   queue.length = 0;
   client.disconnect();
