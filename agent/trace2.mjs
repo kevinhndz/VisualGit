@@ -1,64 +1,41 @@
-import { openSync, readSync, statSync, closeSync } from "node:fs";
+import { chmodSync, existsSync, unlinkSync } from "node:fs";
+import { createServer } from "node:net";
 import { resolve } from "node:path";
 
 export class TraceReader {
-  constructor(file, root, onCommand) {
-    this.file = file;
+  constructor(path, root, onCommand) {
+    this.path = path;
     this.root = resolve(root);
     this.onCommand = onCommand;
-    this.position = 0;
-    this.partial = "";
     this.sessions = new Map();
-    this.timer = null;
+    this.server = null;
   }
 
-  start() {
-    try {
-      this.position = statSync(this.file).size;
-    } catch {
-      this.position = 0;
-    }
-    this.timer = setInterval(() => this.read(), 60);
-  }
-
-  stop() {
-    clearInterval(this.timer);
-  }
-
-  read() {
-    let size;
-    try {
-      size = statSync(this.file).size;
-    } catch {
-      return;
-    }
-    if (size < this.position) {
-      this.position = 0;
-      this.partial = "";
-    }
-    if (size === this.position) return;
-    const fd = openSync(this.file, "r");
-    try {
-      while (this.position < size) {
-        const chunk = Buffer.alloc(Math.min(65536, size - this.position));
-        const count = readSync(fd, chunk, 0, chunk.length, this.position);
-        if (!count) break;
-        this.position += count;
-        const lines = (this.partial + chunk.toString("utf8", 0, count)).split(
-          "\n",
-        );
-        this.partial = lines.pop() || "";
+  async start() {
+    if (existsSync(this.path)) unlinkSync(this.path);
+    this.server = createServer((connection) => {
+      let partial = "";
+      connection.on("data", (chunk) => {
+        const lines = (partial + chunk.toString("utf8")).split("\n");
+        partial = lines.pop() || "";
         for (const line of lines) {
           try {
             this.accept(JSON.parse(line));
           } catch {
-            /* Incomplete or unrelated trace line. */
+            /* Ignore malformed trace lines. */
           }
         }
-      }
-    } finally {
-      closeSync(fd);
-    }
+      });
+    });
+    await new Promise((resolveListen) =>
+      this.server.listen(this.path, resolveListen),
+    );
+    chmodSync(this.path, 0o600);
+  }
+
+  stop() {
+    this.server?.close();
+    if (existsSync(this.path)) unlinkSync(this.path);
   }
 
   accept(record) {

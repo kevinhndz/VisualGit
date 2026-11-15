@@ -13,7 +13,7 @@ export const stateDir = join(
   "gitviz",
 );
 export const configPath = join(configDir, "config.json");
-export const tracePath = join(stateDir, "trace2.jsonl");
+export const tracePath = join(stateDir, "trace2.sock");
 export const pidPath = join(stateDir, "agent.pid");
 export const logPath = join(stateDir, "agent.log");
 export const socketPath = join(stateDir, "commands.sock");
@@ -62,19 +62,23 @@ export function installConfig() {
       previousTraceTarget: currentTraceTarget(),
     };
   }
-  if (currentTraceTarget() !== tracePath) {
+  const target = `af_unix:stream:${tracePath}`;
+  if (currentTraceTarget() !== target) {
     if (!config.installedTraceTarget)
       config.previousTraceTarget = currentTraceTarget();
+    else
+      throw new Error(
+        "Trace2 cambio despues de instalar Git Visual. Revisa la configuracion global antes de reinstalar.",
+      );
     execFileSync("git", [
       "config",
       "--global",
       "--replace-all",
       "trace2.eventTarget",
-      tracePath,
+      target,
     ]);
   }
-  config.installedTraceTarget = tracePath;
-  if (!existsSync(tracePath)) writeFileSync(tracePath, "", { mode: 0o600 });
+  config.installedTraceTarget = target;
   saveConfig(config);
   return config;
 }
