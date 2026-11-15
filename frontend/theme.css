@@ -1,0 +1,99 @@
+:root {
+  color-scheme: dark;
+  --bg: #0f1011;
+  --surface: #141618;
+  --line: #292c30;
+  --text: #e3e4e8;
+  --muted: #92969f;
+  --blue: #6394ff;
+  --green: #45c776;
+  --red: #f07878;
+  --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font:
+    13px/1.5 Inter,
+    system-ui,
+    sans-serif;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+button,
+input {
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #191b1e;
+}
+button {
+  padding: 6px 10px;
+}
+button:hover:not(:disabled) {
+  background: #25282d;
+  border-color: #535964;
+}
+button.primary {
+  background: #2563eb;
+  border-color: #3776ff;
+  color: white;
+}
+button.primary:hover:not(:disabled) {
+  background: #3475ff;
+}
+input {
+  padding: 8px 10px;
+  width: 100%;
+  min-width: 0;
+}
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+code,
+.mono {
+  font-family: var(--mono);
+}
+.empty {
+  color: var(--muted);
+  padding: 20px 14px;
+  margin: 0;
+  font-size: 12px;
+}
+.count,
+.chip {
+  border: 1px solid var(--line);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font: 11px var(--mono);
+  color: var(--muted);
+}
+.count {
+  margin-left: 6px;
+}
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #3c4047;
+  border-radius: 4px;
+}
