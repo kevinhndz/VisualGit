@@ -1,0 +1,53 @@
+.module-menu {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px max(20px, 3vw);
+  background: var(--surface, #171a1c);
+  border-bottom: 1px solid var(--line, #353b3d);
+}
+
+.module-menu button {
+  position: relative;
+  min-height: 40px;
+  padding: 8px 20px;
+}
+
+.module-menu button[aria-current="page"] {
+  border-color: var(--accent, #e9bd6a);
+}
+
+.module-dot {
+  display: none;
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  right: 6px;
+  top: 6px;
+  border-radius: 50%;
+  background: var(--accent, #e9bd6a);
+}
+
+.module-menu button.changed .module-dot {
+  display: block;
+}
+
+.module-screen {
+  width: 100%;
+  display: grid;
+  gap: 24px;
+}
+
+.module-screen[hidden] {
+  display: none;
+}
+
+.module-screen > .panel,
+.module-screen > .pipeline-wrap {
+  width: 100%;
+}
+
+.module-menu button:focus-visible {
+  outline: 2px solid var(--accent, #e9bd6a);
+  outline-offset: 3px;
+}

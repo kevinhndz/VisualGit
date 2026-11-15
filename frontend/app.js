@@ -7,8 +7,10 @@ import { addTimeline, clearTimeline } from "./timeline.js";
 import { renderPullRequests } from "./github.js";
 import { animateEvent, renderScene } from "./scene.js";
 import { demoSteps, freshDemo } from "./simulator.js";
+import { setupModules } from "./modules.js";
 
 const byId = (id) => document.getElementById(id);
+const modules = setupModules();
 const queue = [];
 let busy = false;
 let demo = freshDemo();
@@ -43,6 +45,15 @@ function setStatus(status) {
 }
 
 function enqueue(event, snapshot) {
+  modules.mark(1);
+  if (["pr", "ci", "pr_updated", "pipeline_step"].includes(event.type))
+    modules.mark(2);
+  if (
+    ["commit", "branch", "branch_created", "checkout", "switch"].includes(
+      event.type,
+    )
+  )
+    modules.mark(3);
   showLatency(event);
   queue.push({ event, snapshot, version: generation });
   if (!busy) void drainQueue();
