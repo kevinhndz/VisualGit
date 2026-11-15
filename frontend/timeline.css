@@ -1,0 +1,95 @@
+.timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 45vh;
+  overflow: auto;
+  scrollbar-color: #526077 transparent;
+}
+.timeline li {
+  position: relative;
+  padding: 0 0 18px 20px;
+  border-left: 1px solid #40506d;
+  margin-left: 7px;
+}
+.timeline li:last-child {
+  border-left-color: transparent;
+  padding-bottom: 0;
+}
+.timeline li:before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 4px #59bcff22;
+}
+.timeline li.error:before {
+  background: var(--red);
+  box-shadow: 0 0 0 4px #fb718522;
+}
+.timeline li.working:before {
+  background: var(--amber);
+  box-shadow: 0 0 0 4px #fbbf2422;
+}
+.timeline .when {
+  color: #7f91ad;
+  font:
+    10px ui-monospace,
+    monospace;
+}
+.timeline .command {
+  display: block;
+  margin: 3px 0;
+  color: #d9e8fa;
+  font:
+    12px ui-monospace,
+    monospace;
+  overflow-wrap: anywhere;
+}
+.timeline .explanation {
+  color: #a8b9d0;
+  font-size: 12px;
+}
+.pull-requests {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.pr-card {
+  border: 1px solid #514b76;
+  border-radius: 9px;
+  background: #231e3c;
+  padding: 10px;
+}
+.pr-card .pr-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+}
+.pr-card strong {
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pr-card small {
+  color: #aea6cb;
+  font-size: 11px;
+}
+.pr-card .pr-state {
+  margin-top: 7px;
+  color: #d2c2fd;
+  font-size: 11px;
+}
+footer {
+  border-top: 1px solid #25324b;
+  color: #8293ad;
+  font-size: 11px;
+  padding: 10px 28px;
+  text-align: center;
+}
