@@ -1,0 +1,22 @@
+<svg class="stage-illustration" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 170 110">
+
+<line stroke="#434655" stroke-width="2.5" x1="20" x2="150" y1="84" y2="84"></line>
+<path d="M 30 84 L 30 28 Q 85 20 140 28 L 140 84" stroke="#30343C" stroke-dasharray="2 3" stroke-width="1.8"></path>
+
+<path d="M 48 78 C 48 50, 106 50, 106 78 Z" fill="#202327" stroke="#EAD7BA" stroke-width="2"></path>
+<circle cx="77" cy="48" fill="#EAD7BA" r="3.5"></circle>
+<line stroke="#EAD7BA" stroke-width="2" x1="42" x2="112" y1="78" y2="78"></line>
+
+<path d="M 68 38 Q 72 32 68 28" stroke="#FBBF24" stroke-width="1.5"></path>
+<path d="M 82 36 Q 86 30 82 26" stroke="#FBBF24" stroke-width="1.5"></path>
+
+<circle cx="132" cy="56" fill="#1F2021" r="10" stroke="#A5C4B4" stroke-width="1.8"></circle>
+
+<circle cx="129" cy="54" fill="#E3E4E8" r="1"></circle>
+<circle cx="135" cy="54" fill="#E3E4E8" r="1"></circle>
+<path d="M 129 58 Q 132 61 135 58" stroke="#E3E4E8" stroke-width="1.2"></path>
+<path d="M 120 78 C 120 68, 144 68, 144 78" stroke="#A5C4B4" stroke-width="1.5"></path>
+
+<rect fill="#22C55E" fill-opacity="0.15" height="14" rx="2" stroke="#22C55E" stroke-width="1.2" width="50" x="52" y="88"></rect>
+<text fill="#22C55E" font-family="JetBrains Mono" font-size="8" font-weight="700" text-anchor="middle" x="77" y="98">v1.4.2 ONLINE</text>
+</svg>
