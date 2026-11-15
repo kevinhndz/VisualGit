@@ -1,0 +1,131 @@
+.zone {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  padding: 17px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(160deg, #172437ed, #101a2df0);
+  box-shadow: 0 14px 27px #05081778;
+  transition:
+    transform 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+.zone.impact {
+  animation: impact 0.68s ease-out;
+}
+.zone-icon {
+  height: 40px;
+  width: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: #30232d;
+  color: var(--red);
+  font-size: 24px;
+  margin-bottom: 14px;
+}
+.stage-zone .zone-icon {
+  background: #173e36;
+  color: var(--green);
+}
+.repo-zone .zone-icon {
+  background: #17354d;
+  color: var(--blue);
+}
+.cloud-zone {
+  background: linear-gradient(160deg, #292247ed, #191831f0);
+  border-color: #57457c;
+}
+.cloud-zone .zone-icon {
+  background: #423361;
+  color: var(--purple);
+}
+.zone-kicker {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #93a4bd;
+}
+.zone h2 {
+  font-size: clamp(17px, 1.6vw, 23px);
+  letter-spacing: -0.04em;
+  line-height: 1.16;
+  margin: 6px 0;
+}
+.zone-description {
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 34px;
+}
+.file-list,
+.notebooks,
+.remote-list {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 205px;
+  overflow: auto;
+  scrollbar-color: #526077 transparent;
+}
+.file-pill {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid #3e4a60;
+  border-radius: 8px;
+  background: #1b2739;
+  font-size: 11px;
+  animation: appear 0.3s ease-out;
+}
+.file-pill .file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  flex: 1;
+}
+.file-pill .file-icon {
+  font-size: 15px;
+}
+.file-pill .file-detail {
+  color: var(--muted);
+  white-space: nowrap;
+  font:
+    10px ui-monospace,
+    monospace;
+}
+.file-pill.untracked {
+  border-color: #a34458;
+  color: #ffc0ca;
+  background: #3d2432;
+}
+.file-pill.modified {
+  border-color: #9b7838;
+  color: #ffe29a;
+  background: #3b3129;
+}
+.file-pill.deleted {
+  border-color: #9b4750;
+  color: #ffc0ca;
+  background: #39212b;
+}
+.file-pill.staged {
+  border-color: #377a68;
+  color: #b3fadd;
+  background: #1a3a37;
+}
+.more {
+  color: var(--muted);
+  font-size: 11px;
+  padding: 3px 6px;
+}
+.empty {
+  color: #8494ad;
+  font-size: 12px;
+  line-height: 1.5;
+}

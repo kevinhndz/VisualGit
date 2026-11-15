@@ -1,0 +1,104 @@
+.actor {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  width: 44%;
+  height: 104px;
+  padding: 15px;
+  border: 1px solid #5b4b86;
+  border-radius: 15px;
+  background: #221c39;
+}
+.actor.robot {
+  border-color: #536885;
+  background: #17283b;
+}
+.actor.working {
+  animation: glow 1s infinite alternate;
+}
+.actor.failed {
+  border-color: var(--red);
+  box-shadow: 0 0 22px #fb718540;
+}
+.actor.ready {
+  border-color: var(--green);
+  box-shadow: 0 0 22px #4adea536;
+}
+.actor-emoji {
+  font-size: 34px;
+  filter: drop-shadow(0 4px 9px #0009);
+}
+.actor strong {
+  display: block;
+  font-size: 13px;
+}
+.actor small {
+  display: block;
+  color: #abb9d0;
+  font-size: 11px;
+  line-height: 1.3;
+  margin-top: 4px;
+}
+.review-arrow {
+  font-size: 24px;
+  color: #8877ae;
+}
+.motion-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+.flying-file {
+  position: absolute;
+  left: 12%;
+  top: 47%;
+  font-size: 30px;
+  filter: drop-shadow(0 8px 10px #0009);
+  animation: fly-add 0.72s cubic-bezier(0.22, 0.78, 0.22, 1) forwards;
+}
+.flying-file.commit {
+  left: 37%;
+  animation-name: fly-commit;
+}
+.flying-file.push {
+  left: 62%;
+  animation-name: fly-push;
+}
+.flying-file.pull {
+  left: 87%;
+  animation-name: fly-pull;
+}
+.narration {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  margin-top: 17px;
+  padding: 16px 19px;
+  border: 1px solid #344a67;
+  border-radius: 13px;
+  background: #17243a;
+}
+.narration-icon {
+  display: grid;
+  place-items: center;
+  width: 29px;
+  height: 29px;
+  flex: none;
+  border-radius: 9px;
+  background: #315077;
+  color: #a9dcff;
+}
+.narration strong {
+  font-size: 15px;
+}
+.narration p {
+  color: #a9bdd7;
+  font-size: 13px;
+  margin-top: 3px;
+}
+.narration.failed {
+  border-color: #965265;
+  background: #35202a;
+}

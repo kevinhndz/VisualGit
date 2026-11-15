@@ -1,0 +1,8 @@
+venv/
+.venv/
+details.md
+git.html
+node_modules/
+*.log
+.gitviz/
+.cache/

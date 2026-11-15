@@ -1,0 +1,87 @@
+body.presentation {
+  font-size: 18px;
+}
+body.presentation .layout {
+  grid-template-columns: minmax(0, 1fr) 400px;
+}
+body.presentation .workspace {
+  padding: 35px;
+}
+body.presentation .scene {
+  min-height: 690px;
+}
+body.presentation .zone-description,
+body.presentation .timeline .explanation {
+  font-size: 14px;
+}
+body.presentation .file-pill {
+  font-size: 13px;
+  min-height: 46px;
+}
+@keyframes flow {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes impact {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  22% {
+    transform: translateX(-5px) rotate(-1deg);
+  }
+  46% {
+    transform: translateX(5px) rotate(1deg);
+  }
+  70% {
+    transform: translateX(-2px);
+  }
+}
+@keyframes glow {
+  to {
+    box-shadow: 0 0 28px #62bdf64a;
+  }
+}
+@keyframes fly-add {
+  to {
+    left: 34%;
+    top: 47%;
+    opacity: 0;
+    transform: scale(0.7) rotate(15deg);
+  }
+}
+@keyframes fly-commit {
+  to {
+    left: 60%;
+    top: 47%;
+    opacity: 0;
+    transform: scale(0.7) rotate(15deg);
+  }
+}
+@keyframes fly-push {
+  to {
+    left: 86%;
+    top: 47%;
+    opacity: 0;
+    transform: scale(0.7) rotate(15deg);
+  }
+}
+@keyframes fly-pull {
+  to {
+    left: 61%;
+    top: 47%;
+    opacity: 0;
+    transform: scale(0.7) rotate(-15deg);
+  }
+}
