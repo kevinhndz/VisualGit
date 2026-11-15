@@ -11,7 +11,7 @@
   min-height: 46px;
   padding: 0 12px;
   border-bottom: 1px solid #272a2f;
-  font-size: 11px;
+  font-size: 13px;
 }
 .history-row.is-head {
   background: #11192c;
@@ -41,7 +41,7 @@
   border-radius: 50%;
 }
 .commit-hash {
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   color: var(--blue);
 }
 .commit-subject {
@@ -56,7 +56,7 @@
   overflow: hidden;
 }
 .commit-refs span {
-  font: 9px var(--mono);
+  font: 13px var(--mono);
   border: 1px solid #365686;
   padding: 1px 4px;
   color: var(--blue);
@@ -84,7 +84,7 @@
 }
 #commit-graph text {
   fill: #92969f;
-  font: 9px var(--mono);
+  font: 13px var(--mono);
 }
 #commit-graph .ref-label {
   fill: #a6c2ff;

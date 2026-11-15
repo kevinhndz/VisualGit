@@ -54,10 +54,44 @@ test("porcelain v2 recognizes untracked, staged and modified files", async (t) =
   );
 });
 
+test("filesystem snapshots identify add, commit and push without a command", () => {
+  const base = {
+    initialized: true,
+    branch: "main",
+    head: "aaa",
+    files: [{ path: "libro.py", index: ".", work: "M" }],
+    branches: [{ name: "main", hash: "aaa" }],
+    remotes: [{ name: "origin/main", hash: "aaa" }],
+    commits: [{ hash: "aaa", parents: [], subject: "inicio" }],
+    github: {},
+  };
+  const staged = {
+    ...base,
+    files: [{ path: "libro.py", index: "M", work: "." }],
+  };
+  assert.equal(semanticEvent(base, staged).type, "add");
+  const committed = {
+    ...staged,
+    head: "bbb",
+    files: [],
+    branches: [{ name: "main", hash: "bbb" }],
+    commits: [{ hash: "bbb", parents: ["aaa"], subject: "agregar libro" }],
+  };
+  assert.equal(semanticEvent(staged, committed).type, "commit");
+  assert.equal(semanticEvent(staged, committed).hash, "bbb");
+  const pushed = {
+    ...committed,
+    remotes: [{ name: "origin/main", hash: "bbb" }],
+  };
+  assert.equal(semanticEvent(committed, pushed).type, "push");
+});
+
 test("porcelain handles rename records and numstat without contents", () => {
   const status =
     "# branch.oid (initial)\0# branch.head main\0? sin seguimiento.txt\0";
   assert.deepEqual(parseStatus(status).files[0].path, "sin seguimiento.txt");
+  assert.equal(parseStatus("# branch.ab +2 -1\0").ahead, 2);
+  assert.equal(parseStatus("# branch.ab +2 -1\0").behind, 1);
   const counts = parseNumstat("3\t1\tarchivo.txt\0");
   assert.deepEqual(counts.get("archivo.txt"), { added: 3, deleted: 1 });
 });

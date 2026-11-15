@@ -38,7 +38,7 @@
 .timeline .when {
   color: #7f91ad;
   font:
-    10px ui-monospace,
+    13px ui-monospace,
     monospace;
 }
 .timeline .command {
@@ -46,13 +46,13 @@
   margin: 3px 0;
   color: #d9e8fa;
   font:
-    12px ui-monospace,
+    13px ui-monospace,
     monospace;
   overflow-wrap: anywhere;
 }
 .timeline .explanation {
   color: #a8b9d0;
-  font-size: 12px;
+  font-size: 13px;
 }
 .pull-requests {
   display: flex;
@@ -72,24 +72,24 @@
   gap: 7px;
 }
 .pr-card strong {
-  font-size: 12px;
+  font-size: 13px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .pr-card small {
   color: #aea6cb;
-  font-size: 11px;
+  font-size: 13px;
 }
 .pr-card .pr-state {
   margin-top: 7px;
   color: #d2c2fd;
-  font-size: 11px;
+  font-size: 13px;
 }
 footer {
   border-top: 1px solid #25324b;
   color: #8293ad;
-  font-size: 11px;
+  font-size: 13px;
   padding: 10px 28px;
   text-align: center;
 }

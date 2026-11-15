@@ -1,16 +1,19 @@
 import { randomBytes, randomInt, timingSafeEqual } from "node:crypto";
-import { createReadStream, existsSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
+import { WebSocketServer } from "ws";
 import { pairPath } from "./config.mjs";
 import { installHook, uninstallHooks } from "./hooks.mjs";
 import { installRepoHooks, uninstallRepoHooks } from "./repo-hooks.mjs";
+import { runGit } from "./git.mjs";
 
 const mime = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
   ".svg": "image/svg+xml",
+  ".ttf": "font/ttf",
 };
 
 function readBody(request) {
@@ -26,17 +29,24 @@ function readBody(request) {
 }
 
 export function createAgentHttp({ config, hub, frontendDir, root }) {
+  const websockets = new WebSocketServer({ noServer: true });
   const sessions = new Map();
   let pairCode = config.token;
   let pairExpires = Date.now() + 5 * 60 * 1000;
   let wrongAttempts = 0;
+  let expiryTimer;
   const renewCode = () => {
     pairCode = String(randomInt(1000000)).padStart(6, "0");
     pairExpires = Date.now() + 5 * 60 * 1000;
     wrongAttempts = 0;
-    writeFileSync(pairPath, pairCode, { mode: 0o600 });
+    writeFileSync(config.pairPath || pairPath, pairCode, { mode: 0o600 });
+    clearTimeout(expiryTimer);
+    expiryTimer = setTimeout(renewCode, 5 * 60 * 1000);
+    expiryTimer.unref();
   };
-  writeFileSync(pairPath, pairCode, { mode: 0o600 });
+  writeFileSync(config.pairPath || pairPath, pairCode, { mode: 0o600 });
+  expiryTimer = setTimeout(renewCode, 5 * 60 * 1000);
+  expiryTimer.unref();
   const allowed = new Set(config.allowedOrigins);
   const localHosts = new Set([
     `127.0.0.1:${config.port}`,
@@ -161,6 +171,76 @@ export function createAgentHttp({ config, hub, frontendDir, root }) {
       }
       return;
     }
+    if (url.pathname === "/api/repository" && request.method === "POST") {
+      try {
+        const body = JSON.parse(await readBody(request));
+        const session = sessions.get(body.session);
+        if (
+          !session ||
+          session.expires < Date.now() ||
+          session.origin !== callerOrigin
+        ) {
+          response.writeHead(401);
+          response.end("Primero conecta el agente.");
+          return;
+        }
+        if (typeof config.selectRepository !== "function")
+          throw new Error("Abre Git Visual desde un repositorio.");
+        const selected = config.selectRepository(body.folder);
+        response.setHeader("Content-Type", "application/json");
+        response.end(JSON.stringify(selected));
+      } catch (error) {
+        response.writeHead(400);
+        response.end(error.message);
+      }
+      return;
+    }
+    if (url.pathname.startsWith("/api/commit/") && request.method === "GET") {
+      const session = sessions.get(url.searchParams.get("session"));
+      if (
+        !session ||
+        session.expires < Date.now() ||
+        session.origin !== callerOrigin
+      ) {
+        response.writeHead(401);
+        response.end("Primero conecta el agente.");
+        return;
+      }
+      const hash = url.pathname.slice("/api/commit/".length);
+      if (!/^[0-9a-f]{7,40}$/.test(hash)) {
+        response.writeHead(400);
+        response.end("Hash inválido.");
+        return;
+      }
+      const [info, files] = await Promise.all([
+        runGit(root, ["show", "-s", "--format=%H%n%P%n%an%n%s", hash]),
+        runGit(root, [
+          "diff-tree",
+          "--root",
+          "--no-commit-id",
+          "--name-only",
+          "-r",
+          hash,
+        ]),
+      ]);
+      if (!info.ok) {
+        response.writeHead(404);
+        response.end("Commit no encontrado.");
+        return;
+      }
+      const [fullHash, parents, author, message] = info.stdout.split("\n");
+      response.setHeader("Content-Type", "application/json");
+      response.end(
+        JSON.stringify({
+          hash: fullHash,
+          parents: parents.split(" ").filter(Boolean),
+          author,
+          message,
+          files: files.stdout.split("\n").filter(Boolean),
+        }),
+      );
+      return;
+    }
     if (request.method !== "GET") {
       response.writeHead(405);
       response.end();
@@ -181,7 +261,30 @@ export function createAgentHttp({ config, hub, frontendDir, root }) {
       "Content-Type",
       mime[extname(file)] || "application/octet-stream",
     );
-    createReadStream(file).pipe(response);
+    response.end(readFileSync(file));
   });
+  server.on("upgrade", (request, socket, head) => {
+    const host = request.headers.host || "";
+    const origin = request.headers.origin || "";
+    if (!localHosts.has(host) || !allowed.has(origin)) {
+      socket.destroy();
+      return;
+    }
+    const url = new URL(request.url, `http://${host}`);
+    const session = sessions.get(url.searchParams.get("session"));
+    if (
+      url.pathname !== "/api/ws" ||
+      !session ||
+      session.expires < Date.now() ||
+      session.origin !== origin
+    ) {
+      socket.destroy();
+      return;
+    }
+    websockets.handleUpgrade(request, socket, head, (websocket) => {
+      hub.attachSocket(websocket);
+    });
+  });
+  server.on("close", () => clearTimeout(expiryTimer));
   return server;
 }

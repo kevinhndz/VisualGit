@@ -15,21 +15,21 @@ export async function startAgent(root, config) {
   root = resolve(root);
   let snapshot = await takeSnapshot(root);
   const hub = new EventHub(() => snapshot);
-  const frontendDir = resolve(
-    dirname(fileURLToPath(import.meta.url)),
-    "..",
-    "frontend",
-  );
+  const frontendDir =
+    config.frontendDir ||
+    resolve(dirname(fileURLToPath(import.meta.url)), "..", "frontend");
   const http = createAgentHttp({ config, hub, frontendDir, root });
-  const trace = new TraceReader(
-    tracePath,
-    root,
-    (input) => void refresh(input),
-  );
+  const trace =
+    config.useTrace2 === false
+      ? null
+      : new TraceReader(
+          config.tracePath || tracePath,
+          root,
+          (input) => void refresh(input),
+        );
   const watcher = new RepoWatcher(root, () => scheduleWatch());
   let watchTimer = null;
   let pending = Promise.resolve();
-  let githubTimer = null;
   let lastCommand = null;
 
   function refresh(input = null) {
@@ -37,6 +37,7 @@ export async function startAgent(root, config) {
       .then(async () => {
         const next = await takeSnapshot(root);
         const changed = snapshotSignature(snapshot) !== snapshotSignature(next);
+        if (input?.source === "hook" && !changed) return;
         if (!input && !changed) return;
         if (input?.source === "trace2") {
           const key = input.argv.join(" ");
@@ -47,6 +48,8 @@ export async function startAgent(root, config) {
         const event = semanticEvent(snapshot, next, input || {});
         snapshot = { ...next, github: snapshot.github };
         hub.publish({ kind: "event", event, snapshot });
+        if (event.type === "push" && config.github !== false)
+          void updateGithub();
       })
       .catch((error) => console.error("Snapshot:", error.message));
     return pending;
@@ -96,12 +99,16 @@ export async function startAgent(root, config) {
         const cwd = resolve(input.cwd);
         if (cwd !== root && !cwd.startsWith(root + sep)) return;
         if (typeof input.hook === "string") {
-          void refresh({ argv: ["git", input.hook], source: "hook" });
+          void refresh({ source: "hook", hook: input.hook });
           return;
         }
         if (typeof input.command !== "string" || input.command.length > 300)
           return;
-        if (/^\s*git(?:\s|$)/.test(input.command)) return;
+        if (
+          !/^\s*git(?:\s|$)/.test(input.command) ||
+          config.useTrace2 !== false
+        )
+          return;
         const event = semanticEvent(snapshot, snapshot, {
           command: input.command,
           ts: new Date().toISOString(),
@@ -121,26 +128,27 @@ export async function startAgent(root, config) {
     http.once("error", reject);
     http.listen(config.port, "127.0.0.1", resolveListen);
   });
-  if (existsSync(socketPath)) unlinkSync(socketPath);
+  const commandSocket = config.socketPath || socketPath;
+  if (process.platform !== "win32" && existsSync(commandSocket))
+    unlinkSync(commandSocket);
   await new Promise((resolveListen) =>
-    socket.listen(socketPath, resolveListen),
+    socket.listen(commandSocket, resolveListen),
   );
-  chmodSync(socketPath, 0o600);
-  await trace.start();
-  watcher.start();
+  if (process.platform !== "win32") chmodSync(commandSocket, 0o600);
+  if (trace) await trace.start();
+  if (!config.noRepo) watcher.start();
   if (config.github !== false) {
     void updateGithub();
-    githubTimer = setInterval(() => void updateGithub(), 5000);
   }
 
   return async () => {
     clearTimeout(watchTimer);
-    clearInterval(githubTimer);
-    trace.stop();
+    trace?.stop();
     watcher.stop();
     hub.close();
     socket.close();
     http.close();
-    if (existsSync(socketPath)) unlinkSync(socketPath);
+    if (process.platform !== "win32" && existsSync(commandSocket))
+      unlinkSync(commandSocket);
   };
 }

@@ -12,7 +12,7 @@ function quote(value) {
 }
 
 function block(shell) {
-  const emit = `${quote(process.execPath)} ${quote(cli)} emit`;
+  const emit = `${quote(process.execPath)} ${globalThis.Bun?.isStandaloneExecutable ? "" : `${quote(cli)} `}emit`;
   if (shell === "zsh") {
     return [
       start,

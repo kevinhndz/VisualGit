@@ -43,7 +43,7 @@
   color: var(--purple);
 }
 .zone-kicker {
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: #93a4bd;
@@ -55,7 +55,7 @@
   margin: 6px 0;
 }
 .zone-description {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
   min-height: 34px;
 }
@@ -79,7 +79,7 @@
   border: 1px solid #3e4a60;
   border-radius: 8px;
   background: #1b2739;
-  font-size: 11px;
+  font-size: 13px;
   animation: appear 0.3s ease-out;
 }
 .file-pill .file-name {
@@ -96,7 +96,7 @@
   color: var(--muted);
   white-space: nowrap;
   font:
-    10px ui-monospace,
+    13px ui-monospace,
     monospace;
 }
 .file-pill.untracked {
@@ -121,11 +121,11 @@
 }
 .more {
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   padding: 3px 6px;
 }
 .empty {
   color: #8494ad;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.5;
 }

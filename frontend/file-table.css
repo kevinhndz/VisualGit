@@ -15,7 +15,7 @@
 }
 .file-name {
   display: block;
-  font: 11px var(--mono);
+  font: 13px var(--mono);
   color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -24,14 +24,14 @@
 .file-directory {
   display: block;
   color: var(--muted);
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   margin-top: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .file-detail {
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   color: var(--green);
   white-space: nowrap;
 }
@@ -46,5 +46,5 @@
   display: block;
   padding: 8px 12px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }

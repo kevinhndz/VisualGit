@@ -37,8 +37,8 @@ export class AgentClient {
 
   openEvents() {
     if (!this.session) return;
-    this.source = new EventSource(
-      `${this.base}/api/events?session=${encodeURIComponent(this.session)}`,
+    this.source = new WebSocket(
+      `${this.base.replace(/^http/, "ws")}/api/ws?session=${encodeURIComponent(this.session)}`,
     );
     this.source.onopen = () => this.onStatus("connected");
     this.source.onmessage = (message) => {
@@ -49,6 +49,12 @@ export class AgentClient {
       }
     };
     this.source.onerror = () => this.onStatus("reconnecting");
+    this.source.onclose = () => {
+      if (this.session) {
+        this.onStatus("reconnecting");
+        this.retry = setTimeout(() => this.openEvents(), 1000);
+      }
+    };
   }
 
   disconnect() {

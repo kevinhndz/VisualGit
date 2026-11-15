@@ -34,6 +34,9 @@ export function setupModules() {
   setupTools.className = "panel setup-tools";
   setupTools.innerHTML = `<h2>Preparar Git Visual</h2>
     <p>Repositorio observado: <strong id="setup-repo">Sin conexión</strong></p>
+    <p id="network-status" role="status"></p>
+    <label for="repository-folder">Carpeta del repositorio <input id="repository-folder" type="text" placeholder="/ruta/a/tu/proyecto" /></label>
+    <button type="button" id="choose-repository">Elegir esta carpeta</button>
     <p>La integración de terminal añade un bloque a tu archivo de inicio de bash o zsh. Los hooks añaden avisos a este repositorio y conservan tus hooks actuales.</p>
     <div class="setup-buttons">
       <button type="button" data-integration="install-shell">Instalar integración de terminal</button>
@@ -50,8 +53,26 @@ export function setupModules() {
     panels[0],
     document.querySelector(".terminal-panel"),
   );
+  const commitBox = document.createElement("section");
+  commitBox.className = "panel latest-commit";
+  commitBox.innerHTML =
+    '<h2>Último commit</h2><p id="latest-commit">Todavía no hay commits.</p>';
+  screens[1].insertBefore(
+    commitBox,
+    screens[1].querySelector(".terminal-panel"),
+  );
   screens[2].append(panels[2]);
   screens[3].append(panels[1]);
+  const filter = document.createElement("label");
+  filter.innerHTML =
+    'Filtrar rama <select id="branch-filter"><option value="">Todas las ramas</option></select>';
+  screens[3].prepend(filter);
+  const details = document.createElement("section");
+  details.id = "commit-details";
+  details.className = "panel";
+  details.setAttribute("aria-live", "polite");
+  details.textContent = "Selecciona un commit para ver sus datos y archivos.";
+  screens[3].append(details);
   dashboard.remove();
 
   let active = 0;

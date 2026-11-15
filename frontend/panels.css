@@ -31,14 +31,14 @@
   color: var(--purple);
 }
 .help {
-  font-size: 12px;
+  font-size: 13px;
   color: #aab9d0;
   margin-bottom: 13px;
 }
 .panel label {
   display: block;
   color: #b8c6dc;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   margin: 11px 0 5px;
 }
@@ -51,7 +51,7 @@
   color: var(--text);
   background: #0c1523;
   font:
-    12px ui-monospace,
+    13px ui-monospace,
     monospace;
 }
 .connect-row {
@@ -65,7 +65,7 @@
   min-height: 17px;
   margin-top: 8px;
   color: #ffacb8;
-  font-size: 11px;
+  font-size: 13px;
 }
 .mode-row {
   display: flex;
@@ -75,7 +75,7 @@
 }
 .mode-row .button {
   border: 0;
-  font-size: 11px;
+  font-size: 13px;
   padding: 4px;
 }
 .debug-panel {
@@ -83,7 +83,7 @@
   margin-top: 12px;
   padding-top: 11px;
   color: #9eafc8;
-  font-size: 11px;
+  font-size: 13px;
 }
 .debug-panel span {
   display: block;
@@ -94,7 +94,7 @@
 }
 .count {
   font:
-    11px ui-monospace,
+    13px ui-monospace,
     monospace;
   color: #9eb8d5;
   background: #27384e;

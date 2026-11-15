@@ -131,6 +131,7 @@ switch (command) {
     break;
   }
   case "emit": {
+    if (!/^\s*git(?:\s|$)/.test(process.argv.slice(3).join(" "))) break;
     if (!existsSync(socketPath)) break;
     const socket = createConnection(socketPath);
     socket.on("error", () => {});

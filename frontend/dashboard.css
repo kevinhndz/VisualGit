@@ -22,12 +22,12 @@
   gap: 8px;
 }
 .panel-heading h2 {
-  font-size: 12px;
+  font-size: 13px;
   margin: 0;
   font-weight: 600;
 }
 .panel-heading small {
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   color: var(--muted);
 }
 .subheading {
@@ -45,7 +45,7 @@
 }
 .remote-list {
   padding: 0 12px 12px;
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   color: var(--muted);
 }
 .remote-pill {
@@ -59,11 +59,11 @@
   flex-direction: column;
   gap: 3px;
   padding: 10px 12px;
-  font-size: 11px;
+  font-size: 13px;
 }
 .actor small {
   color: var(--muted);
-  font-size: 10px;
+  font-size: 13px;
 }
 .actor.ready strong {
   color: var(--green);
@@ -77,7 +77,7 @@
 .help-inline {
   padding: 12px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   margin: 0;
   border-top: 1px solid var(--line);
 }

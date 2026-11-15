@@ -51,3 +51,33 @@
   outline: 2px solid var(--accent, #e9bd6a);
   outline-offset: 3px;
 }
+
+.stage-plates,
+.repo-blocks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center;
+}
+
+.stage-plate {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 7px 11px;
+  border: 2px solid #e4cfa6;
+  border-radius: 50%;
+  background: #554831;
+  font-size: 13px;
+}
+
+.repo-block {
+  padding: 5px 8px;
+  border: 1px solid #79bbf1;
+  border-radius: 4px;
+  background: #203957;
+  font:
+    13px ui-monospace,
+    monospace;
+}

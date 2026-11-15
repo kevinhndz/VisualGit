@@ -73,6 +73,11 @@
               src="./images/tray.svg"
               alt="Bandeja y plato con un archivo preparado"
             />
+            <div
+              id="stage-plates"
+              class="stage-plates"
+              aria-label="Platos con archivos preparados"
+            ></div>
             <div class="zone-summary">
               <strong id="stage-summary">Sin conexion</strong
               ><small>listos para commit</small>
@@ -90,6 +95,11 @@
               src="./images/repository.svg"
               alt="Archivador para los commits locales"
             />
+            <div
+              id="repo-blocks"
+              class="repo-blocks"
+              aria-label="Bloques de commits"
+            ></div>
             <div class="zone-summary">
               <strong id="repo-summary">Sin commits</strong
               ><small>guardado en tu disco</small>
@@ -227,9 +237,10 @@
       <details id="connection-panel" class="panel connection-panel" open>
         <summary>Conexion con tu terminal</summary>
         <p class="connection-help">
-          Desde la carpeta de tu proyecto ejecuta <code>gitviz start</code>.
-          Copia su codigo y conecta aqui. Si ya observabas otra carpeta, ejecuta
-          <code>gitviz stop</code> antes.
+          Desde la carpeta de tu proyecto ejecuta <code>git visual</code>. Copia
+          el código que aparece en la terminal y conéctalo aquí. Si abriste la
+          aplicación con su icono, usa <code>git visual codigo</code> en esa
+          carpeta.
         </p>
         <div class="connection-fields">
           <label for="agent-url"

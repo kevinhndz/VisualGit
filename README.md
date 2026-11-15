@@ -1,128 +1,59 @@
 # Git Visual
 
-Git Visual convierte lo que haces con Git en una escena animada para explicar repositorios en clase. El agente corre en tu Ubuntu y observa un repositorio real. La pagina puede abrirse en localhost o desde GitHub Pages en **la misma computadora**. Una pagina publicada no puede leer el disco por si sola: siempre necesita el agente local.
+Git Visual enseña cómo pasan los cambios de tus archivos a staging, commits, ramas y GitHub. El agente se ejecuta en tu computadora y la interfaz está en español. No usa IA, no envía telemetría y los archivos de la interfaz vienen dentro del ejecutable.
 
-## Recorrido visual
+Las fuentes DM Sans y Space Grotesk se incluyen localmente. Sus licencias OFL están en `frontend/fonts/`.
 
-La interfaz muestra seis escenas: computadora, bandeja de staging, archivo local,
-nube de GitHub, robot de CI e integracion. Debajo aparecen los archivos, el
-historial de commits, las ramas y los Pull Requests del repositorio observado.
+## Instalar
 
-Los botones de comandos y los controles Anterior/Siguiente permiten explorar
-conceptos. Usa **Volver en vivo** para que la escena seleccionada vuelva a seguir
-los comandos de la terminal. Los datos del repositorio siguen actualizandose
-mientras exploras. **Ver demostracion** muestra una secuencia de ejemplo y cambia
-el indicador de conexion a modo demostracion; **Conectar** regresa al agente real.
+Lee [install.sh](install.sh) o [install.ps1](install.ps1) antes de ejecutarlo. Ambos muestran lo que harán y piden confirmación. Descargan la versión publicada y comprueban su SHA-256 antes de instalarla en tu cuenta de usuario.
 
-La sexta escena muestra integraciones informadas por GitHub. No afirma que un
-despliegue este publicado: esa informacion depende del pipeline del proyecto.
+Linux o macOS, en una terminal:
 
-## Requisitos
-
-- Ubuntu con [Node.js 18 o superior](https://nodejs.org/en/download).
-- Git instalado.
-- [GitHub CLI](https://cli.github.com/) y `gh auth login` para mostrar Pull Requests y checks reales. Las funciones locales de Git sirven sin `gh`.
-
-## Empezar en un comando
-
-En este repositorio ejecuta:
-
-```bash
-bash install.sh
+```sh
+curl -fsSLO https://github.com/kevinhndz/VisualGit/releases/latest/download/install.sh && sh install.sh
 ```
 
-El instalador crea un codigo de emparejamiento, configura `trace2.eventTarget` en tu Git global y arranca el agente. Muestra la URL `http://127.0.0.1:43721`. Abre esa pagina, pega el codigo y pulsa **Conectar**. El agente solo escucha en `127.0.0.1`.
+Windows, en PowerShell:
 
-La instalacion tambien crea `~/.local/bin/gitviz` si esa ruta no existe. Si `gitviz` no aparece en tu terminal, usa `~/Documents/robot/gitviz` o agrega `~/.local/bin` a tu `PATH`.
-
-Para observar otro repositorio, detiene el agente y arrancalo desde la carpeta que quieres explicar:
-
-```bash
-gitviz stop
-cd ~/Documents/mi-clase-git
-gitviz start
+```powershell
+Invoke-WebRequest https://github.com/kevinhndz/VisualGit/releases/latest/download/install.ps1 -OutFile install.ps1; .\install.ps1
 ```
 
-La carpeta puede estar vacia. Asi puedes iniciar el agente, ejecutar `git init` en esa terminal y ver la carpeta y la boveda reaccionar. Para clases en este mismo proyecto, no hace falta cambiar de carpeta.
+Si Windows muestra SmartScreen, el ejecutable todavía no está firmado. Revisa el archivo y su SHA-256 antes de aceptar la advertencia.
 
-## Demostracion rapida
+**Alternativa manual:** descarga el ejecutable de tu sistema y `SHA256SUMS` desde la página de Releases, comprueba el hash y pon el ejecutable en una carpeta de tu `PATH` con el nombre `git-visual` (o `git-visual.exe`). Si trabajas desde el código fuente, instala Bun y ejecuta `bun build --compile agent/desktop.mjs --asset ./frontend --outfile git-visual`.
 
-Con el agente activo, escribe comandos reales en la terminal del repositorio:
+## Usar
 
-```bash
-git init
-printf 'hola\n' > ejemplo.txt
-git add ejemplo.txt
-git restore --staged ejemplo.txt
-git add ejemplo.txt
-git commit -m "Primer cambio"
-git switch -c tema
-git push -u origin tema
+Dentro de un repositorio, ejecuta `git visual`. Git busca el ejecutable `git-visual` en tu `PATH`. Se abre una ventana del navegador local. En la terminal aparece un código de seis dígitos; escríbelo en la pantalla **Setup**. El código dura cinco minutos y solo sirve una vez. Tras cinco intentos fallidos se genera otro código. El agente solo escucha en `127.0.0.1`.
+
+```sh
+git visual                  # abre el agente y la interfaz
+git visual --no-abrir       # solo inicia el agente
+git visual --port 43800     # usa un puerto concreto
+git visual codigo           # muestra el código actual
+git visual estado           # muestra la URL del agente de este repositorio
+git visual detener          # detiene ese agente
+git visual desinstalar      # retira la instalación del usuario
 ```
 
-La escena muestra archivos en rojo si Git aun no los sigue, ambar si cambiaron, verde si estan en stage, azul para commits locales y morado para referencias remotas. Cada rama es un cuaderno y cada commit aparece como una hoja. La linea de tiempo explica el resultado del comando. Si el comando falla, la escena muestra un aviso rojo y el codigo de salida.
+Si inicias la aplicación fuera de un repositorio, Setup permite escribir la ruta de la carpeta que quieres observar. Cada repositorio tiene su propio agente, puerto y código. Las acciones de Git siguen funcionando sin conexión a Internet.
 
-Tambien se ven ediciones hechas con VS Code o nano porque el agente observa el arbol de archivos y compara snapshots de Git. Para narrar comandos que no son Git, como `cat`, `nano`, `ls` o `touch`, instala el hook opcional en una terminal nueva:
+En **Setup** puedes instalar los avisos de Git de este repositorio. Los hooks nuevos llaman primero a tus hooks anteriores; al quitarlos, se restaura su configuración. También puedes añadir o quitar la integración de bash o zsh. Cada botón explica el archivo que cambia. La pantalla **Flujo** conserva las seis escenas; **PR/CI** muestra los datos que conoce el agente; **Commits y ramas** muestra el historial.
 
-```bash
-gitviz hook install zsh
-# O: gitviz hook install bash
-```
+## Estado de las fases
 
-El hook de zsh recibe la linea de comando. El de bash usa `DEBUG` y `PROMPT_COMMAND`; puede interactuar con otras personalizaciones de shell que usan esas mismas funciones. Los archivos ignorados por Git no aparecen en la escena. Los contenidos de archivos y los diffs nunca se envian al navegador; solo nombres, estados, hashes y conteos de lineas. Los comandos que mencionan `.env` se ocultan en la linea de tiempo.
+La versión de código fuente sigue incluyendo `gitviz`, el antiguo control por Node, para desarrollo. El ejecutable nuevo usa Bun solo al compilar; quien lo descarga no necesita Bun ni Node. La interfaz y sus ilustraciones están incluidas en el binario.
 
-## Frontend desplegado
+Las pantallas de PR/CI y la terminal visual todavía usan la presentación existente. Los PR locales, CI local, terminal sincronizada, el grafo de página completa y la animación detallada por archivo se desarrollarán en las fases posteriores. La compilación y apertura del ejecutable se comprobaron en Linux x64; los otros sistemas se compilan en el workflow de versiones y necesitan validación en sus equipos respectivos.
 
-La pagina estatica se publica en [GitHub Pages](https://kevinhndz.github.io/VisualGit/) desde `frontend/` cuando pasan las pruebas de `main`. Tambien puedes subir solo la carpeta `frontend/` a Netlify, Vercel o Cloudflare Pages. No tiene build y usa rutas relativas.
+## Desarrollo
 
-Abre la pagina publicada en **el mismo Ubuntu donde corre el agente**. Deja la direccion `http://127.0.0.1:43721`, pega el mismo codigo y conecta. La pagina publicada usa HTTPS y el agente usa HTTP local; Chrome puede pedir permiso de acceso a la red local. Los navegadores y sus versiones cambian este comportamiento. [Chrome documenta Local Network Access](https://developer.chrome.com/blog/local-network-access/) y [WebKit documenta sus cambios para localhost](https://bugs.webkit.org/show_bug.cgi?id=171934). Si Safari bloquea la conexion, usa la pagina local o un navegador que permita la conexion en tu version. No se ha probado Safari en este proyecto.
-
-Si publicas en otro dominio, autoriza su origen exacto y reinicia el agente:
-
-```bash
-gitviz allow-origin https://tu-dominio.example
-gitviz stop
-gitviz start
-```
-
-`127.0.0.1` siempre apunta a la computadora que abre la pagina. Si abres la pagina en otra computadora, no llegara al agente de tu Ubuntu. Esta version no incluye relay; para proyectar desde otra maquina usa el navegador del Ubuntu conectado por HDMI o duplicacion de pantalla.
-
-## GitHub y CI
-
-El agente consulta `gh pr list` cada cinco segundos. Muestra PR reales, checks reportados por GitHub y el estado de revision. El robot refleja esos checks; el mediador refleja aprobaciones y conflictos. La CI de este repositorio ejecuta pruebas en Node 18, 20 y 22 para cada push o PR a `main`, y despliega `frontend/` a GitHub Pages despues de aprobar los tests.
-
-La consulta remota depende de la red y la API de GitHub; no tiene el objetivo de menos de un segundo de los comandos locales. Esta version muestra checks agregados, no el contenido de logs ni los pasos internos de cada job. Las acciones de crear o fusionar PR se hacen en tu terminal con `gh` o en GitHub.
-
-## Comandos de control
-
-| Comando                    | Uso                                                                            |
-| -------------------------- | ------------------------------------------------------------------------------ |
-| `gitviz start`             | Observa el directorio actual y sirve el frontend local.                        |
-| `gitviz stop`              | Detiene el agente.                                                             |
-| `gitviz status`            | Muestra si el agente esta activo.                                              |
-| `gitviz token`             | Muestra el codigo de emparejamiento.                                           |
-| `gitviz hook install zsh`  | Narra comandos de zsh.                                                         |
-| `gitviz hook install bash` | Narra comandos de bash.                                                        |
-| `gitviz hook uninstall`    | Retira los bloques agregados a los archivos rc.                                |
-| `gitviz uninstall`         | Detiene el agente, retira los hooks, restaura Trace2 y borra su configuracion. |
-
-El instalador guarda su configuracion en `~/.config/gitviz/` y archivos de ejecucion en `~/.local/state/gitviz/`. Si ya habia un valor global de `trace2.eventTarget`, lo guarda y lo restaura al desinstalar. Si ese valor cambia despues de instalar Git Visual, la desinstalacion no lo sobrescribe.
-
-## Pruebas
-
-```bash
+```sh
 npm ci
 npm test
 npm run format:check
 ```
 
-Las pruebas crean repositorios temporales, verifican el estado real de Git, el parser porcelain v2, eventos semanticos, emparejamiento con otro origen, la latencia de `git add` y la instalacion reversible. La prueba de origen alojado simula el header del navegador; no equivale a una prueba visual en Chrome o Safari.
-
-## Solucion de problemas
-
-- **No conecta**: comprueba `gitviz status`, el codigo mostrado por `gitviz token` y la URL local.
-- **Origen no autorizado**: ejecuta `gitviz allow-origin` con el origen exacto de la pagina y reinicia.
-- **No veo comandos de cat o nano**: instala el hook opcional y abre una terminal nueva. Los cambios guardados en archivos se ven sin hook.
-- **No veo PR ni CI**: ejecuta `gh auth login`, comprueba que el repositorio tenga remoto GitHub y espera unos segundos.
-- **No aparecen archivos ignorados**: es intencional; Git Visual respeta `.gitignore`.
-- **Puerto ocupado**: detiene otra instancia con `gitviz stop` o revisa `~/.local/state/gitviz/agent.log`.
+La CI existente ejecuta las pruebas en Node 18, 20 y 22. Un tag `v*` activa el workflow que crea ejecutables para Linux x64/arm64, macOS Intel/Apple Silicon y Windows x64, y publica `SHA256SUMS` junto a ellos. El sitio de GitHub Pages sigue disponible para desarrollo; el uso local no lo necesita.

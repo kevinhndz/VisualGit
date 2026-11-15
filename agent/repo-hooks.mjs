@@ -4,6 +4,7 @@ import {
   existsSync,
   mkdirSync,
   readFileSync,
+  readdirSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -53,7 +54,7 @@ export function installRepoHooks(root) {
     const script = [
       "#!/bin/sh",
       `if [ -x ${quote(join(oldDir, name))} ]; then ${quote(join(oldDir, name))} "$@" || exit $?; fi`,
-      `${quote(process.execPath)} ${quote(cli)} hook-event ${quote(name)} >/dev/null 2>&1 &`,
+      `${quote(process.execPath.replaceAll("\\", "/"))} ${globalThis.Bun?.isStandaloneExecutable ? "" : `${quote(cli)} `}hook-event ${quote(name)} >/dev/null 2>&1 &`,
       "exit 0",
       "",
     ].join("\n");
@@ -80,4 +81,18 @@ export function uninstallRepoHooks(root) {
   else git(root, ["config", "--local", "--unset", "core.hooksPath"]);
   rmSync(dir, { recursive: true, force: true });
   return true;
+}
+
+export function uninstallAllRepoHooks() {
+  const base = join(stateDir, "hooks");
+  if (!existsSync(base)) return;
+  for (const name of readdirSync(base)) {
+    const meta = join(base, name, "previous.json");
+    if (!existsSync(meta)) continue;
+    try {
+      uninstallRepoHooks(JSON.parse(readFileSync(meta, "utf8")).root);
+    } catch {
+      // A deleted or unavailable repository cannot be changed.
+    }
+  }
 }

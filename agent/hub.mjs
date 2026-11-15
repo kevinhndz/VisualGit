@@ -2,8 +2,21 @@ export class EventHub {
   constructor(getSnapshot) {
     this.getSnapshot = getSnapshot;
     this.clients = new Set();
+    this.sockets = new Set();
     this.history = [];
     this.nextId = 1;
+  }
+
+  attachSocket(socket, lastId = 0) {
+    socket.send(
+      JSON.stringify({ kind: "snapshot", snapshot: this.getSnapshot() }),
+    );
+    for (const item of this.history) {
+      if (item.id > lastId)
+        socket.send(JSON.stringify({ ...item.data, replay: true }));
+    }
+    this.sockets.add(socket);
+    socket.on("close", () => this.sockets.delete(socket));
   }
 
   attach(response, lastId = 0) {
@@ -36,14 +49,19 @@ export class EventHub {
 
   publish(data) {
     const item = { id: this.nextId++, data };
-    this.history.push(item);
-    if (this.history.length > 200) this.history.shift();
+    if (data.kind === "event") {
+      this.history.push(item);
+      if (this.history.length > 200) this.history.shift();
+    }
     const message = `id: ${item.id}\ndata: ${JSON.stringify(data)}\n\n`;
     for (const response of this.clients) response.write(message);
+    for (const socket of this.sockets) socket.send(JSON.stringify(data));
   }
 
   close() {
     for (const response of this.clients) response.end();
     this.clients.clear();
+    for (const socket of this.sockets) socket.close();
+    this.sockets.clear();
   }
 }
