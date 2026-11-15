@@ -2,6 +2,7 @@ const byId = (id) => document.getElementById(id);
 let eventCount = 0;
 
 export function addTimeline(event) {
+  document.getElementById("timeline-empty").hidden = true;
   const row = document.createElement("li");
   row.className =
     event.type === "error" ? "error" : event.pending ? "working" : "";
