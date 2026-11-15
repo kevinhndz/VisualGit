@@ -6,14 +6,14 @@
 
 <rect fill="#1F2021" height="22" rx="2" stroke="#2563EB" stroke-width="1.8" width="74" x="48" y="22"></rect>
 <rect fill="#8D90A0" height="4" rx="1" width="12" x="79" y="31"></rect>
-<text fill="#93C5FD" font-family="JetBrains Mono" font-size="8.5" font-weight="600" x="54" y="36">1a99d6b</text>
+
 <circle cx="114" cy="33" fill="#22C55E" r="2.5"></circle>
 
 <rect fill="#181A1D" height="22" rx="2" stroke="#434655" stroke-width="1.5" width="74" x="48" y="48"></rect>
 <rect fill="#8D90A0" height="4" rx="1" width="12" x="79" y="57"></rect>
-<text fill="#C7C6C6" font-family="JetBrains Mono" font-size="8.5" x="54" y="62">45da723</text>
+
 
 <rect fill="#141618" height="20" rx="2" stroke="#434655" stroke-width="1.5" width="74" x="48" y="74"></rect>
 <rect fill="#717680" height="3" rx="1" width="12" x="79" y="82"></rect>
-<text fill="#717680" font-family="JetBrains Mono" font-size="8" x="54" y="87">489d95b</text>
+
 </svg>

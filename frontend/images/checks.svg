@@ -10,7 +10,7 @@
 <line stroke="#8D90A0" stroke-width="1.2" x1="38" x2="54" y1="58" y2="58"></line>
 
 <rect fill="#22C55E" fill-opacity="0.15" height="12" rx="2" stroke="#22C55E" stroke-width="1.2" width="34" x="24" y="66"></rect>
-<text fill="#22C55E" font-family="JetBrains Mono" font-size="7" font-weight="700" text-anchor="middle" x="41" y="75">PASSED</text>
+
 
 <line stroke="#434655" stroke-width="3" x1="74" x2="152" y1="84" y2="84"></line>
 <circle cx="82" cy="88" r="3" stroke="#8D90A0" stroke-width="1.5"></circle>

@@ -18,5 +18,5 @@
 <path d="M 120 78 C 120 68, 144 68, 144 78" stroke="#A5C4B4" stroke-width="1.5"></path>
 
 <rect fill="#22C55E" fill-opacity="0.15" height="14" rx="2" stroke="#22C55E" stroke-width="1.2" width="50" x="52" y="88"></rect>
-<text fill="#22C55E" font-family="JetBrains Mono" font-size="8" font-weight="700" text-anchor="middle" x="77" y="98">v1.4.2 ONLINE</text>
+
 </svg>
