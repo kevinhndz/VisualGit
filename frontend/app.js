@@ -24,7 +24,12 @@ function renderSnapshot(snapshot) {
 }
 
 function setStatus(status) {
-  if (status === "connected") byId("connection-panel").open = false;
+  if (status === "connected") {
+    byId("connection-panel").open = false;
+    byId("narration-title").textContent = "Repositorio conectado";
+    byId("narration-text").textContent =
+      "Ejecuta tus comandos en la terminal para seguir el recorrido de los cambios.";
+  }
   if (status === "disconnected") byId("connection-panel").open = true;
   const dot = byId("connection-dot");
   dot.className = `status-dot ${status === "connected" ? "connected" : status === "demo" ? "" : "disconnected"}`;

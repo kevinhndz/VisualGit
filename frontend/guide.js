@@ -57,7 +57,7 @@ export function eventStage(type) {
 export function selectStage(index, manual = true) {
   if (!manual) {
     lastLive = index;
-    if (exploring) return;
+    if (exploring) return false;
   }
   active = Math.max(0, Math.min(stages.length - 1, index));
   if (manual) exploring = true;
@@ -73,6 +73,7 @@ export function selectStage(index, manual = true) {
     document.getElementById("narration-title").textContent = stages[active][0];
     document.getElementById("narration-text").textContent = stages[active][1];
   }
+  return true;
 }
 
 export function setupGuide() {

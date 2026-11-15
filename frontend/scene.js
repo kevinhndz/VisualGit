@@ -171,7 +171,7 @@ const flights = {
 };
 
 export function animateEvent(event) {
-  selectStage(eventStage(event.type), false);
+  const followsLive = selectStage(eventStage(event.type), false);
   const cards = [...document.querySelectorAll(".scene .zone")];
   const route = flights[event.type];
   if (route && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -200,6 +200,7 @@ export function animateEvent(event) {
     );
     animation.onfinish = () => packet.remove();
   }
+  if (!followsLive) return;
   byId("narration").classList.toggle("failed", event.type === "error");
   byId("narration-title").textContent =
     event.title || "Cambio en el repositorio";
