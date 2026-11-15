@@ -122,10 +122,12 @@ export async function startAgent(root, config) {
     socket.listen(socketPath, resolveListen),
   );
   chmodSync(socketPath, 0o600);
-  trace.start();
+  await trace.start();
   watcher.start();
-  void updateGithub();
-  githubTimer = setInterval(() => void updateGithub(), 5000);
+  if (config.github !== false) {
+    void updateGithub();
+    githubTimer = setInterval(() => void updateGithub(), 5000);
+  }
 
   return async () => {
     clearTimeout(watchTimer);
