@@ -72,15 +72,18 @@ export function renderGraph(snapshot) {
       ),
     );
   }
+  const labelsPerCommit = new Map();
   for (const branch of branches.slice(0, 3)) {
     const point = points.get(branch.hash);
     if (!point) continue;
+    const offset = labelsPerCommit.get(branch.hash) || 0;
+    labelsPerCommit.set(branch.hash, offset + 1);
     host.append(
       svg(
         "text",
         {
           x: point.x,
-          y: point.y - 16,
+          y: point.y - 16 - offset * 12,
           class: "ref-label",
           "text-anchor": "middle",
         },
