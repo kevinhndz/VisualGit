@@ -14,13 +14,11 @@ export class EventHub {
       "X-Accel-Buffering": "no",
     });
     response.write(": connected\n\n");
-    if (lastId) {
-      for (const item of this.history) {
-        if (item.id > lastId)
-          response.write(
-            `id: ${item.id}\ndata: ${JSON.stringify(item.data)}\n\n`,
-          );
-      }
+    for (const item of this.history) {
+      if (item.id > lastId)
+        response.write(
+          `id: ${item.id}\ndata: ${JSON.stringify(item.data)}\n\n`,
+        );
     }
     response.write(
       `data: ${JSON.stringify({ kind: "snapshot", snapshot: this.getSnapshot() })}\n\n`,
@@ -39,7 +37,7 @@ export class EventHub {
   publish(data) {
     const item = { id: this.nextId++, data };
     this.history.push(item);
-    if (this.history.length > 300) this.history.shift();
+    if (this.history.length > 200) this.history.shift();
     const message = `id: ${item.id}\ndata: ${JSON.stringify(data)}\n\n`;
     for (const response of this.clients) response.write(message);
   }

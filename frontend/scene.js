@@ -163,6 +163,7 @@ const flights = {
   add: [0, 1],
   unstage: [1, 0],
   commit: [1, 2],
+  revert: [2, 1],
   push: [2, 3],
   fetch: [3, 2],
   pull: [3, 0],

@@ -73,8 +73,8 @@ export async function startAgent(root, config) {
           (check) =>
             check.status === "IN_PROGRESS" || check.conclusion === "FAILURE",
         )
-          ? "ci"
-          : "pr",
+          ? "pipeline_step"
+          : "pr_updated",
         title: "GitHub actualizo el Pull Request",
         explanation: `PR #${pr.number}: ${pr.title}. ${pr.checks.length} checks observados.`,
         command: `GitHub PR #${pr.number}`,

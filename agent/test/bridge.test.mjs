@@ -142,7 +142,7 @@ test("hosted origin pairs and receives a real Git event quickly", async (t) => {
   writeFileSync(join(root, "app.js"), "console.log(2);\n");
   await expectCommand(["add", "app.js"], "add");
   await expectCommand(["restore", "--staged", "app.js"], "unstage");
-  await expectCommand(["branch", "tema"], "branch");
+  await expectCommand(["branch", "tema"], "branch_created");
   await expectCommand(["branch", "-d", "tema"], "branch_delete");
   await expectCommand(["status", "--short"], "inspect");
 });

@@ -86,7 +86,7 @@ export function semanticEvent(before, after, input = {}) {
         "Git actualizo las ramas remotas sin tocar tus archivos de trabajo.",
       ],
       merge: [
-        after.operation === "merge" ? "conflict" : "merge",
+        after.operation === "merge" ? "merge_conflict" : "merge",
         after.operation === "merge" ? "Conflicto de merge" : "Ramas unidas",
         after.operation === "merge"
           ? "Hay conflictos que debes resolver antes de continuar."
@@ -103,7 +103,7 @@ export function semanticEvent(before, after, input = {}) {
         "Git aplico un commit de otra rama en este cuaderno.",
       ],
       revert: [
-        "commit",
+        "revert",
         "Cambio revertido",
         "Git creo un commit que deshace otro cambio.",
       ],
@@ -156,7 +156,7 @@ export function semanticEvent(before, after, input = {}) {
             "La rama local desaparecio; sus commits pueden seguir en otras referencias.",
           ]
         : [
-            "branch",
+            "branch_created",
             "Cuaderno actualizado",
             "Git creo, renombro o mostro una rama.",
           ];
@@ -164,12 +164,12 @@ export function semanticEvent(before, after, input = {}) {
       [type, title, explanation] =
         args.includes("-c") || args.includes("-b")
           ? [
-              "branch",
+              "branch_created",
               "Cuaderno nuevo",
               "Git creo una rama nueva y movio HEAD a ella.",
             ]
           : [
-              "switch",
+              "checkout",
               "Cuaderno cambiado",
               "HEAD paso a otra rama y los archivos reflejan su version.",
             ];
@@ -211,6 +211,15 @@ export function semanticEvent(before, after, input = {}) {
     refs: after.branches.map((branch) => branch.name),
     from: before.head,
     to: after.head,
+    hash: type === "commit" || type === "revert" ? after.head : null,
+    parent:
+      type === "commit" || type === "revert"
+        ? after.commits?.[0]?.parents?.[0] || null
+        : null,
+    message:
+      type === "commit" || type === "revert"
+        ? after.commits?.[0]?.subject || ""
+        : "",
     exitCode,
     ts: input.ts || new Date().toISOString(),
   };
