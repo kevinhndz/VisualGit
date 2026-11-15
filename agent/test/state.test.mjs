@@ -96,4 +96,14 @@ test("semantic events cover add, restore, commit, branch and fallback", () => {
     semanticEvent(before, before, { argv: ["git", "push"], exitCode: 1 }).type,
     "error",
   );
+  assert.equal(
+    semanticEvent(before, before, { command: "echo secreto > .env" }).command,
+    "[comando sobre archivo privado]",
+  );
+  assert.equal(
+    semanticEvent({ ...before, initialized: false }, before, {
+      argv: ["git", "init"],
+    }).type,
+    "init",
+  );
 });

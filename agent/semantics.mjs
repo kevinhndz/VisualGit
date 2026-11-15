@@ -11,8 +11,10 @@ function gitAction(argv) {
 }
 
 function safeCommand(argv) {
-  return argv
-    .join(" ")
+  const line = argv.join(" ");
+  if (/(?:^|[\s/])\.env(?:\.[^\s/]+)?(?:\s|$)/i.test(line))
+    return "[comando sobre archivo privado]";
+  return line
     .replace(/(https?:\/\/)[^/@\s]+@/gi, "$1***@")
     .replace(
       /((?:token|password|secret|authorization|extraheader)[=:])[^\s]+/gi,
@@ -31,7 +33,8 @@ function changed(before, after) {
 export function semanticEvent(before, after, input = {}) {
   const argv = input.argv || [];
   const action = gitAction(argv);
-  const command = input.command || safeCommand(argv) || "Cambio detectado";
+  const command =
+    safeCommand(input.command ? [input.command] : argv) || "Cambio detectado";
   const exitCode = input.exitCode ?? 0;
   const didChange = changed(before, after);
   let type = didChange ? "generic" : "inspect";
@@ -203,7 +206,7 @@ export function semanticEvent(before, after, input = {}) {
     title,
     explanation,
     command,
-    args: argv.slice(1),
+    args: argv.slice(1).map((arg) => safeCommand([arg])),
     files,
     refs: after.branches.map((branch) => branch.name),
     from: before.head,
