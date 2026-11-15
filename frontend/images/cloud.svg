@@ -1,0 +1,23 @@
+<svg class="stage-illustration" fill="none" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 170 110">
+
+<path d="M 38 78 C 24 78, 16 66, 22 52 C 20 40, 32 30, 44 32 C 52 20, 74 18, 86 28 C 96 22, 114 24, 120 34 C 134 32, 146 44, 142 58 C 150 68, 142 78, 130 78 Z" fill="#181A1D" stroke="#8D90A0" stroke-width="2"></path>
+
+<line stroke="#434655" stroke-width="2" x1="36" x2="108" y1="62" y2="62"></line>
+<circle cx="48" cy="62" fill="#0F1011" r="3" stroke="#2563EB" stroke-width="2"></circle>
+<path d="M 60 62 Q 74 46 94 46 L 114 46" stroke="#2563EB" stroke-dasharray="2 2" stroke-width="1.8"></path>
+<circle cx="106" cy="46" fill="#2563EB" r="3"></circle>
+
+<g transform="translate(112, 46)">
+
+<circle cx="18" cy="18" fill="#202327" r="14" stroke="#C7C6C6" stroke-width="1.8"></circle>
+
+<polygon fill="#C7C6C6" points="8,8 12,2 17,9"></polygon>
+<polygon fill="#C7C6C6" points="27,9 32,2 36,8"></polygon>
+
+<circle cx="14" cy="17" fill="#E3E4E8" r="1.5"></circle>
+<circle cx="23" cy="17" fill="#E3E4E8" r="1.5"></circle>
+<path d="M 17 22 Q 19 24 21 22" stroke="#E3E4E8" stroke-width="1.2"></path>
+
+<path d="M 31 20 C 37 16, 38 8, 33 5" stroke="#C7C6C6" stroke-width="1.8"></path>
+</g>
+</svg>
