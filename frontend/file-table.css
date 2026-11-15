@@ -1,0 +1,50 @@
+.file-list {
+  max-height: 220px;
+  overflow: auto;
+}
+.file-pill {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 11px 12px;
+  border-bottom: 1px solid #24272b;
+  align-items: center;
+}
+.file-label {
+  min-width: 0;
+}
+.file-name {
+  display: block;
+  font: 11px var(--mono);
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-directory {
+  display: block;
+  color: var(--muted);
+  font: 10px var(--mono);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.file-detail {
+  font: 10px var(--mono);
+  color: var(--green);
+  white-space: nowrap;
+}
+.file-pill.deleted .file-detail {
+  color: var(--red);
+}
+.file-pill.staged {
+  background: #11192b;
+  border-left: 2px solid #3c78ff;
+}
+.more {
+  display: block;
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 11px;
+}
