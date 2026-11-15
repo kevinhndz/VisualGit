@@ -41,7 +41,10 @@ export class TraceReader {
   accept(record) {
     if (!record.sid) return;
     const session = this.sessions.get(record.sid) || { argv: null, root: null };
-    if (record.event === "start") session.argv = record.argv;
+    if (record.event === "start") {
+      session.argv = record.argv;
+      session.startTime = record.time;
+    }
     if (record.event === "def_repo")
       session.root = record.worktree ? resolve(record.worktree) : null;
     if (record.event === "exit") {
@@ -49,7 +52,7 @@ export class TraceReader {
         this.onCommand({
           argv: session.argv,
           exitCode: record.code,
-          ts: record.time,
+          ts: session.startTime || record.time,
           source: "trace2",
         });
       }
