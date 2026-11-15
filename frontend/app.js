@@ -1,4 +1,5 @@
 import { AgentClient } from "./client.js";
+import { renderGraph } from "./graph.js";
 import { showLatency } from "./metrics.js";
 import { addTimeline } from "./timeline.js";
 import { renderPullRequests } from "./github.js";
@@ -37,6 +38,7 @@ async function drainQueue() {
     if (snapshot) {
       currentSnapshot = snapshot;
       renderScene(snapshot);
+      renderGraph(snapshot);
       renderPullRequests(snapshot);
     }
     addTimeline(event);
@@ -50,12 +52,14 @@ const client = new AgentClient((message) => {
   if (message.kind === "snapshot") {
     currentSnapshot = message.snapshot;
     renderScene(currentSnapshot);
+    renderGraph(currentSnapshot);
     renderPullRequests(currentSnapshot);
   } else if (message.kind === "event") {
     enqueue(message.event, message.snapshot);
   } else if (message.kind === "github") {
     currentSnapshot.github = message.github;
     renderScene(currentSnapshot);
+    renderGraph(currentSnapshot);
     renderPullRequests(currentSnapshot);
   }
 }, setStatus);
@@ -92,6 +96,7 @@ function startDemo() {
   demo = freshDemo();
   currentSnapshot = demo;
   renderScene(demo);
+  renderGraph(demo);
   renderPullRequests(demo);
   let step = 0;
   const next = () => {
@@ -132,6 +137,7 @@ byId("agent-url").value =
   localStorage.getItem("gitviz-agent") || byId("agent-url").value;
 byId("pair-token").value = sessionStorage.getItem("gitviz-token") || "";
 renderScene(demo);
+renderGraph(demo);
 renderPullRequests(demo);
 setStatus("demo");
 if (byId("pair-token").value) void connect();

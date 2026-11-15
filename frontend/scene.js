@@ -61,9 +61,15 @@ function branchBook(branch, snapshot) {
     ),
   );
   const pages = element("div", "book-pages");
-  const total =
-    snapshot.commits?.filter((item) => item.branch === branch.name).length ||
-    (branch.hash ? 1 : 0);
+  const byHash = new Map(
+    (snapshot.commits || []).map((item) => [item.hash, item]),
+  );
+  let hash = branch.hash;
+  let total = 0;
+  while (hash && byHash.has(hash) && total < 8) {
+    total++;
+    hash = byHash.get(hash).parents?.[0];
+  }
   for (let i = 0; i < Math.min(total, 8); i++) pages.append(element("i"));
   node.append(pages);
   return node;

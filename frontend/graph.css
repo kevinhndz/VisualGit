@@ -1,0 +1,65 @@
+.graph-panel {
+  margin-top: 16px;
+  padding: 14px 17px;
+  border: 1px solid #34445e;
+  border-radius: 13px;
+  background: #111c2d;
+}
+
+.graph-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.graph-heading strong {
+  font-size: 13px;
+}
+
+.graph-heading span {
+  color: #8fa6c2;
+  font:
+    10px ui-monospace,
+    monospace;
+}
+
+.graph-scroll {
+  overflow-x: auto;
+  scrollbar-color: #526077 transparent;
+}
+
+#commit-graph {
+  display: block;
+  min-width: 100%;
+  height: 138px;
+  margin-top: 8px;
+}
+
+#commit-graph line {
+  stroke: #657995;
+  stroke-width: 2;
+}
+
+#commit-graph circle {
+  fill: #59bcff;
+  stroke: #cdeeff;
+  stroke-width: 2;
+}
+
+#commit-graph circle.head {
+  fill: #ba9dff;
+  stroke-width: 3;
+}
+
+#commit-graph text {
+  fill: #adc3df;
+  font:
+    10px ui-monospace,
+    monospace;
+}
+
+#commit-graph .ref-label {
+  fill: #e3d7ff;
+  font-weight: bold;
+}
