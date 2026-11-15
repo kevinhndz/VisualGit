@@ -4,6 +4,23 @@ Git Visual convierte lo que haces con Git en una escena animada para explicar re
 
 ## Requisitos
 
+## Recorrido visual
+
+La interfaz muestra seis escenas: computadora, bandeja de staging, archivo local,
+nube de GitHub, robot de CI e integracion. Debajo aparecen los archivos, el
+historial de commits, las ramas y los Pull Requests del repositorio observado.
+
+Los botones de comandos y los controles Anterior/Siguiente permiten explorar
+conceptos. Usa **Volver en vivo** para que la escena seleccionada vuelva a seguir
+los comandos de la terminal. Los datos del repositorio siguen actualizandose
+mientras exploras. **Ver demostracion** muestra una secuencia de ejemplo y cambia
+el indicador de conexion a modo demostracion; **Conectar** regresa al agente real.
+
+La sexta escena muestra integraciones informadas por GitHub. No afirma que un
+despliegue este publicado: esa informacion depende del pipeline del proyecto.
+
+## Dependencias locales
+
 - Ubuntu con [Node.js 18 o superior](https://nodejs.org/en/download).
 - Git instalado.
 - [GitHub CLI](https://cli.github.com/) y `gh auth login` para mostrar Pull Requests y checks reales. Las funciones locales de Git sirven sin `gh`.
