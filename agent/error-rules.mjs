@@ -1,10 +1,15 @@
-import { createRequire } from "node:module";
-import { appendFileSync, mkdirSync } from "node:fs";
-import { join } from "node:path";
+import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { stateDir } from "./config.mjs";
 
-const require = createRequire(import.meta.url);
-export const rules = require("../rules/errores.es.json");
+const rulesPath = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  globalThis.Bun?.isStandaloneExecutable
+    ? "rules/errores.es.json"
+    : "../rules/errores.es.json",
+);
+export const rules = JSON.parse(readFileSync(rulesPath, "utf8"));
 const compiled = rules.map((rule) => ({
   ...rule,
   expressions: rule.match.map((pattern) => new RegExp(pattern, "i")),
