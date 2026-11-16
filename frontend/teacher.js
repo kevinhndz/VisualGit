@@ -106,6 +106,16 @@ export function setupTeacher() {
       : "Profesor";
     writing.replaceChildren();
     addSection(stages[0], current.what);
+    if (current.original) {
+      const copyError = document.createElement("button");
+      copyError.type = "button";
+      copyError.textContent = "Copiar error";
+      copyError.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(current.original);
+        copyError.textContent = "Error copiado";
+      });
+      writing.append(copyError);
+    }
     if (stage >= 1) {
       const section = addSection(stages[1], current.why);
       section.append(drawCause(current.scene));

@@ -22,7 +22,7 @@ Invoke-WebRequest https://github.com/kevinhndz/VisualGit/releases/latest/downloa
 
 Si Windows muestra SmartScreen, el ejecutable todavía no está firmado. Revisa el archivo y su SHA-256 antes de aceptar la advertencia.
 
-**Alternativa manual:** descarga el ejecutable de tu sistema y `SHA256SUMS` desde la página de Releases, comprueba el hash y pon el ejecutable en una carpeta de tu `PATH` con el nombre `git-visual` (o `git-visual.exe`). Si trabajas desde el código fuente, instala Bun y ejecuta `bun build --compile agent/desktop.mjs --asset ./frontend --outfile git-visual`.
+**Alternativa manual:** descarga el ejecutable de tu sistema y `SHA256SUMS` desde la página de Releases, comprueba el hash y pon el ejecutable en una carpeta de tu `PATH` con el nombre `git-visual` (o `git-visual.exe`). Si trabajas desde el código fuente, instala Bun y ejecuta `bun build --compile agent/desktop.mjs --asset ./frontend --asset ./rules --outfile git-visual`.
 
 ## Usar
 
@@ -48,11 +48,19 @@ Cuando Git informa un error o el repositorio entra en un estado que requiere ate
 
 Para que el ejecutable reciba también los códigos de salida de comandos fallidos en tu terminal, pulsa **Instalar integración de terminal** en Setup y abre una terminal nueva. Si ya la habías instalado, pulsa el botón otra vez para actualizar el bloque de Git Visual. El bloque anterior se sustituye sin tocar el resto de tu archivo de inicio. El antiguo control `gitviz` usa además los mensajes de error de Git Trace2. Algunos programas externos no envían su texto de error por ese canal; en esos casos la pizarra muestra una explicación general y puedes leer el detalle completo en tu terminal. Mientras la pantalla **PR/CI** está abierta y hay Internet, el agente actualiza los datos de GitHub cada 45 segundos para detectar checks fallidos.
 
+Las explicaciones están en [rules/errores.es.json](rules/errores.es.json). Para añadir una regla, copia una entrada y cambia `id`, `match` (expresiones regulares que aparecen en el error real), `categoria`, `titulo`, `que_paso`, `por_que`, `pasos`, `como_evitarlo` y `escena`. Pon las reglas específicas antes que las generales. Añade un ejemplo de stderr con ese id a [agent/test/error-rules.test.mjs](agent/test/error-rules.test.mjs) y ejecuta `npm test`. Los errores sin regla se guardan, con credenciales ocultas, en `~/.local/state/gitviz/errores-sin-regla.jsonl`. El profesor muestra el texto original ocultando credenciales y ofrece **Copiar error**.
+
+## PR y CI local
+
+En **PR/CI**, escribe un título, la rama con tus cambios y la rama de destino. El PR vive en tu computadora y se guarda fuera del repositorio, en `~/.local/state/gitviz/`. Puedes pasarlo por borrador, abierto, en revisión y aprobación simulada. Para hacer **Merge con CI local**, cambia a la rama de destino y guarda tus cambios. El robot ejecuta cada paso; si todos pasan, Git hace un merge real. Si alguno falla, el PR queda abierto y el profesor explica qué revisar. Los PR de GitHub aparecen cuando hay sesión de `gh` y conexión; al perderla se muestra la edad de los últimos datos guardados.
+
+El pipeline se define en `.git-visual/pipeline.json` dentro del repositorio observado. Cada paso tiene `name` y `command` como lista de palabras, por ejemplo `["npm", "test"]`; no se usa una consola para interpretar operadores. Si el archivo no existe, Git Visual usa la plantilla incluida en este proyecto: checkout, instalación, build, tests, lint y deploy. Edita los comandos para que correspondan a tu proyecto. El paso deploy de la plantilla solo comprueba el estado de Git; no publica nada.
+
 ## Estado de las fases
 
 La versión de código fuente sigue incluyendo `gitviz`, el antiguo control por Node, para desarrollo. El ejecutable nuevo usa Bun solo al compilar; quien lo descarga no necesita Bun ni Node. La interfaz y sus ilustraciones están incluidas en el binario.
 
-Las pantallas de PR/CI y la terminal visual todavía usan la presentación existente. Los PR locales, CI local, terminal sincronizada, el grafo de página completa y la animación detallada por archivo se desarrollarán en las fases posteriores. La compilación y apertura del ejecutable se comprobaron en Linux x64; los otros sistemas se compilan en el workflow de versiones y necesitan validación en sus equipos respectivos.
+Las fases 4 y 5 añaden el catálogo de errores, PR locales, CI local y el robot. La terminal sincronizada corresponde a la fase 6 y aún no está implementada. La compilación y apertura del ejecutable se comprobaron antes en Linux x64; esta revisión necesita una nueva compilación para incluir las fases 4 y 5.
 
 ## Desarrollo
 

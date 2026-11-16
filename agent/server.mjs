@@ -8,20 +8,39 @@ import { takeSnapshot, snapshotSignature } from "./snapshot.mjs";
 import { semanticEvent } from "./semantics.mjs";
 import { TraceReader } from "./trace2.mjs";
 import { RepoWatcher } from "./watcher.mjs";
-import { fetchGithub } from "./github.mjs";
+import { cachedGithub, fetchGithub } from "./github.mjs";
+import { LocalPrs } from "./local-pr.mjs";
 import { socketPath, tracePath } from "./config.mjs";
 import { commandProblem, githubProblems, stateProblems } from "./teacher.mjs";
 
 export async function startAgent(root, config) {
   root = resolve(root);
   let snapshot = await takeSnapshot(root);
+  snapshot.github = cachedGithub(root);
   snapshot.problems = stateProblems(snapshot);
   const hub = new EventHub(() => snapshot);
+  const localPrs = new LocalPrs(root, (message) => hub.publish(message));
+  snapshot.localPrs = await localPrs.list();
   const frontendDir =
     config.frontendDir ||
     resolve(dirname(fileURLToPath(import.meta.url)), "..", "frontend");
   const http = createAgentHttp({
-    config: { ...config, refreshGithub: () => updateGithub() },
+    config: {
+      ...config,
+      refreshGithub: () => updateGithub(),
+      localPrAction: async (body) => {
+        let result;
+        if (body.action === "list") result = await localPrs.list();
+        else if (body.action === "create") result = await localPrs.create(body);
+        else if (body.action === "state")
+          result = await localPrs.setState(body.id, body.state);
+        else if (body.action === "merge")
+          result = await localPrs.merge(body.id);
+        else throw new Error("Acción de PR desconocida.");
+        snapshot.localPrs = await localPrs.list();
+        return result;
+      },
+    },
     hub,
     frontendDir,
     root,
@@ -47,6 +66,7 @@ export async function startAgent(root, config) {
           ...stateProblems(next),
           ...githubProblems(snapshot.github),
         ];
+        next.localPrs = snapshot.localPrs;
         const changed = snapshotSignature(snapshot) !== snapshotSignature(next);
         if (input?.source === "hook" && !changed) return;
         if (!input && !changed) return;
@@ -59,7 +79,10 @@ export async function startAgent(root, config) {
         const event = semanticEvent(snapshot, next, input || {});
         const beforeProblems = snapshot.problems;
         snapshot = { ...next, github: snapshot.github };
+        snapshot.localPrs = await localPrs.list();
         hub.publish({ kind: "event", event, snapshot });
+        if (event.type === "push" && event.exitCode === 0)
+          void localPrs.branchUpdated(next.branch);
         if (event.type === "push" && event.exitCode === 0)
           hub.publish({
             kind: "teacher",
@@ -84,7 +107,11 @@ export async function startAgent(root, config) {
           if (!current.has(id))
             hub.publish({ kind: "teacher", action: "resolved", id });
         }
-        if (event.type === "push" && config.github !== false)
+        if (
+          event.type === "push" &&
+          event.exitCode === 0 &&
+          config.github !== false
+        )
           void updateGithub();
       })
       .catch((error) => console.error("Snapshot:", error.message));
@@ -120,11 +147,9 @@ export async function startAgent(root, config) {
       if (!newProblems.has(id))
         hub.publish({ kind: "teacher", action: "resolved", id });
     }
-    if (
-      JSON.stringify(old?.prs) !== JSON.stringify(next.prs) &&
-      next.prs.length
-    ) {
-      const pr = next.prs[0];
+    for (const pr of next.prs || []) {
+      const previous = old?.prs?.find((item) => item.number === pr.number);
+      if (previous && JSON.stringify(previous) === JSON.stringify(pr)) continue;
       const event = {
         type: pr.checks.some(
           (check) =>
@@ -132,12 +157,30 @@ export async function startAgent(root, config) {
         )
           ? "pipeline_step"
           : "pr_updated",
-        title: "GitHub actualizo el Pull Request",
-        explanation: `PR #${pr.number}: ${pr.title}. ${pr.checks.length} checks observados.`,
+        title: "GitHub actualizó el Pull Request",
+        explanation: `PR #${pr.number}: tu PR sigue abierto y se actualizó con tu nuevo push. ${pr.checks.length} checks observados.`,
         command: `GitHub PR #${pr.number}`,
         ts: new Date().toISOString(),
       };
       hub.publish({ kind: "event", event, snapshot });
+    }
+    for (const run of next.runs || []) {
+      const previous = old?.runs?.find(
+        (item) => item.databaseId === run.databaseId,
+      );
+      if (previous && JSON.stringify(previous) === JSON.stringify(run))
+        continue;
+      hub.publish({
+        kind: "event",
+        event: {
+          type: "pipeline_step",
+          title: `CI de GitHub: ${run.name}`,
+          explanation: `Estado: ${run.conclusion || run.status}. Rama: ${run.headBranch}.`,
+          command: `GitHub Actions #${run.databaseId}`,
+          ts: new Date().toISOString(),
+        },
+        snapshot,
+      });
     }
   }
 
@@ -163,10 +206,13 @@ export async function startAgent(root, config) {
           config.useTrace2 !== false
         )
           return;
-        if (Number.isInteger(input.exitCode) && input.exitCode !== 0) {
+        if (Number.isInteger(input.exitCode)) {
           void refresh({
             command: input.command,
             exitCode: input.exitCode,
+            argv: /^\s*git\s+push(?:\s|$)/.test(input.command)
+              ? ["git", "push"]
+              : [],
             source: "shell",
           });
           return;
@@ -199,9 +245,6 @@ export async function startAgent(root, config) {
   if (process.platform !== "win32") chmodSync(commandSocket, 0o600);
   if (trace) await trace.start();
   if (!config.noRepo) watcher.start();
-  if (config.github !== false) {
-    void updateGithub();
-  }
 
   return async () => {
     clearTimeout(watchTimer);

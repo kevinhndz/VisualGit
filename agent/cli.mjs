@@ -153,12 +153,7 @@ switch (command) {
   case "emit-result": {
     const exitCode = Number(process.argv[3]);
     const command = process.argv.slice(4).join(" ");
-    if (
-      !Number.isInteger(exitCode) ||
-      exitCode === 0 ||
-      !/^\s*git(?:\s|$)/.test(command)
-    )
-      break;
+    if (!Number.isInteger(exitCode) || !/^\s*git(?:\s|$)/.test(command)) break;
     if (!existsSync(socketPath)) break;
     const socket = createConnection(socketPath);
     socket.on("error", () => {});

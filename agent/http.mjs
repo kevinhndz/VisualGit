@@ -173,6 +173,33 @@ export function createAgentHttp({ config, hub, frontendDir, root }) {
       }
       return;
     }
+    if (url.pathname === "/api/local-pr" && request.method === "POST") {
+      try {
+        const body = JSON.parse(await readBody(request));
+        const session = sessions.get(body.session);
+        if (
+          !session ||
+          session.expires < Date.now() ||
+          session.origin !== callerOrigin
+        ) {
+          response.writeHead(401);
+          response.end("Primero conecta el agente.");
+          return;
+        }
+        if (
+          body.id !== undefined &&
+          (!Number.isSafeInteger(body.id) || body.id < 1)
+        )
+          throw new Error("Número de PR inválido.");
+        const result = await config.localPrAction(body);
+        response.setHeader("Content-Type", "application/json");
+        response.end(JSON.stringify({ ok: true, result }));
+      } catch (error) {
+        response.writeHead(400);
+        response.end(error.message);
+      }
+      return;
+    }
     if (url.pathname === "/api/events" && request.method === "GET") {
       const session = sessions.get(url.searchParams.get("session"));
       if (

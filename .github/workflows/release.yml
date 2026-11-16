@@ -46,7 +46,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist
-          bun build --compile --target=${{ matrix.target }} agent/desktop.mjs --asset ./frontend ${{ matrix.flags }} --outfile dist/${{ matrix.asset }}
+          bun build --compile --target=${{ matrix.target }} agent/desktop.mjs --asset ./frontend --asset ./rules ${{ matrix.flags }} --outfile dist/${{ matrix.asset }}
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.asset }}
