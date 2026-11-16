@@ -20,7 +20,7 @@ export function commandProblem(event, snapshot) {
   const command = publicMessage(event.command);
   const context = `${stderr} ${command}`.toLowerCase();
 
-  if (/push|non-fast-forward|failed to push/.test(context))
+  if (/non-fast-forward|rejected|failed to push/.test(stderr.toLowerCase()))
     return issue(
       "push-rejected",
       "Git no pudo enviar tus cambios",

@@ -8,10 +8,12 @@ import { renderPullRequests } from "./github.js";
 import { animateEvent, renderScene } from "./scene.js";
 import { demoSteps, freshDemo } from "./simulator.js";
 import { setupModules } from "./modules.js";
+import { setupTeacher } from "./teacher.js";
 
 const byId = (id) => document.getElementById(id);
 const savedSessionKey = "gitviz-session";
 const modules = setupModules();
+const teacher = setupTeacher();
 function updateNetworkStatus() {
   byId("network-status").textContent = navigator.onLine
     ? "Internet disponible. Git local también funciona sin internet."
@@ -97,12 +99,16 @@ const client = new AgentClient((message) => {
   if (message.kind === "snapshot") {
     currentSnapshot = message.snapshot;
     renderSnapshot(currentSnapshot);
+    for (const problem of currentSnapshot.problems || []) teacher.show(problem);
   } else if (message.kind === "event") {
     if (message.replay) addTimeline(message.event);
     else enqueue(message.event, message.snapshot);
   } else if (message.kind === "github") {
     currentSnapshot.github = message.github;
     renderSnapshot(currentSnapshot);
+  } else if (message.kind === "teacher") {
+    if (message.action === "show") teacher.show(message.problem);
+    if (message.action === "resolved") teacher.resolved(message.id);
   }
 }, setStatus);
 
