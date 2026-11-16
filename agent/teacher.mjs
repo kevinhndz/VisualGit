@@ -199,3 +199,17 @@ export function pullRequestProblem(pr) {
     "merge",
   );
 }
+
+export function githubProblems(github) {
+  const problems = [];
+  for (const pr of github?.prs || []) {
+    if (pr.mergeStateStatus === "DIRTY") problems.push(pullRequestProblem(pr));
+    for (const check of pr.checks || []) {
+      if (
+        ["FAILURE", "TIMED_OUT", "ACTION_REQUIRED"].includes(check.conclusion)
+      )
+        problems.push(pipelineProblem(pr, check));
+    }
+  }
+  return problems;
+}

@@ -84,6 +84,9 @@ export function setupModules() {
       if (i === index) button.classList.remove("changed");
     });
     document.querySelector(".guide-controls").hidden = index !== 1;
+    window.dispatchEvent(
+      new CustomEvent("gitvisual:module", { detail: index }),
+    );
   }
   menu.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-module]");
@@ -91,6 +94,7 @@ export function setupModules() {
   });
   show(0);
   return {
+    active: () => active,
     mark(index) {
       if (index !== active)
         menu

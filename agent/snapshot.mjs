@@ -108,6 +108,6 @@ export async function takeSnapshot(root) {
 }
 
 export function snapshotSignature(snapshot) {
-  const { github, ...local } = snapshot;
+  const { github, problems, ...local } = snapshot;
   return JSON.stringify(local);
 }

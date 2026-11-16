@@ -146,6 +146,33 @@ export function createAgentHttp({ config, hub, frontendDir, root }) {
       }
       return;
     }
+    if (url.pathname === "/api/github/refresh" && request.method === "POST") {
+      try {
+        const body = JSON.parse(await readBody(request));
+        const session = sessions.get(body.session);
+        if (
+          !session ||
+          session.expires < Date.now() ||
+          session.origin !== callerOrigin
+        ) {
+          response.writeHead(401);
+          response.end("Sesion vencida");
+          return;
+        }
+        if (config.github === false) {
+          response.writeHead(404);
+          response.end();
+          return;
+        }
+        await config.refreshGithub();
+        response.setHeader("Content-Type", "application/json");
+        response.end(JSON.stringify({ ok: true }));
+      } catch {
+        response.writeHead(400);
+        response.end("No se pudo actualizar GitHub");
+      }
+      return;
+    }
     if (url.pathname === "/api/events" && request.method === "GET") {
       const session = sessions.get(url.searchParams.get("session"));
       if (

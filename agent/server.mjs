@@ -10,12 +10,7 @@ import { TraceReader } from "./trace2.mjs";
 import { RepoWatcher } from "./watcher.mjs";
 import { fetchGithub } from "./github.mjs";
 import { socketPath, tracePath } from "./config.mjs";
-import {
-  commandProblem,
-  pipelineProblem,
-  pullRequestProblem,
-  stateProblems,
-} from "./teacher.mjs";
+import { commandProblem, githubProblems, stateProblems } from "./teacher.mjs";
 
 export async function startAgent(root, config) {
   root = resolve(root);
@@ -25,7 +20,12 @@ export async function startAgent(root, config) {
   const frontendDir =
     config.frontendDir ||
     resolve(dirname(fileURLToPath(import.meta.url)), "..", "frontend");
-  const http = createAgentHttp({ config, hub, frontendDir, root });
+  const http = createAgentHttp({
+    config: { ...config, refreshGithub: () => updateGithub() },
+    hub,
+    frontendDir,
+    root,
+  });
   const trace =
     config.useTrace2 === false
       ? null
@@ -43,7 +43,10 @@ export async function startAgent(root, config) {
     pending = pending
       .then(async () => {
         const next = await takeSnapshot(root);
-        next.problems = stateProblems(next);
+        next.problems = [
+          ...stateProblems(next),
+          ...githubProblems(snapshot.github),
+        ];
         const changed = snapshotSignature(snapshot) !== snapshotSignature(next);
         if (input?.source === "hook" && !changed) return;
         if (!input && !changed) return;
@@ -97,36 +100,18 @@ export async function startAgent(root, config) {
     const next = await fetchGithub(root);
     if (JSON.stringify(next) === JSON.stringify(snapshot.github)) return;
     const old = snapshot.github;
-    snapshot = { ...snapshot, github: next };
+    snapshot = {
+      ...snapshot,
+      github: next,
+      problems: [...stateProblems(snapshot), ...githubProblems(next)],
+    };
     hub.publish({ kind: "github", github: next });
-    const oldProblems = new Map();
-    for (const pr of old?.prs || []) {
-      if (pr.mergeStateStatus === "DIRTY")
-        oldProblems.set(`pr-${pr.number}`, pullRequestProblem(pr));
-      for (const check of pr.checks || []) {
-        if (
-          ["FAILURE", "TIMED_OUT", "ACTION_REQUIRED"].includes(check.conclusion)
-        )
-          oldProblems.set(
-            `ci-${pr.number}-${check.name}`,
-            pipelineProblem(pr, check),
-          );
-      }
-    }
-    const newProblems = new Map();
-    for (const pr of next.prs || []) {
-      if (pr.mergeStateStatus === "DIRTY")
-        newProblems.set(`pr-${pr.number}`, pullRequestProblem(pr));
-      for (const check of pr.checks || []) {
-        if (
-          ["FAILURE", "TIMED_OUT", "ACTION_REQUIRED"].includes(check.conclusion)
-        )
-          newProblems.set(
-            `ci-${pr.number}-${check.name}`,
-            pipelineProblem(pr, check),
-          );
-      }
-    }
+    const oldProblems = new Map(
+      githubProblems(old).map((item) => [item.id, item]),
+    );
+    const newProblems = new Map(
+      githubProblems(next).map((item) => [item.id, item]),
+    );
     for (const [id, problem] of newProblems) {
       if (!oldProblems.has(id))
         hub.publish({ kind: "teacher", action: "show", problem });

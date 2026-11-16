@@ -52,6 +52,7 @@ function setStatus(status) {
     byId("narration-title").textContent = "Repositorio conectado";
     byId("narration-text").textContent =
       "Ejecuta tus comandos en la terminal para seguir el recorrido de los cambios.";
+    void refreshGithubIfVisible();
   }
   if (status === "disconnected") byId("connection-panel").open = true;
   const dot = byId("connection-dot");
@@ -111,6 +112,25 @@ const client = new AgentClient((message) => {
     if (message.action === "resolved") teacher.resolved(message.id);
   }
 }, setStatus);
+
+async function refreshGithubIfVisible() {
+  if (modules.active() !== 2 || !navigator.onLine || !client.session) return;
+  try {
+    await fetch(`${client.base}/api/github/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session: client.session }),
+    });
+  } catch {
+    // El estado local de Git sigue disponible sin Internet.
+  }
+}
+window.addEventListener(
+  "gitvisual:module",
+  () => void refreshGithubIfVisible(),
+);
+window.addEventListener("online", () => void refreshGithubIfVisible());
+setInterval(refreshGithubIfVisible, 45000);
 
 async function connect() {
   generation++;
