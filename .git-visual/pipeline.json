@@ -1,0 +1,13 @@
+{
+  "steps": [
+    { "name": "checkout", "command": ["git", "status", "--short"] },
+    { "name": "install dependencies", "command": ["npm", "ci", "--offline"] },
+    { "name": "build", "command": ["npm", "run", "build", "--if-present"] },
+    { "name": "tests", "command": ["npm", "test"] },
+    {
+      "name": "lint",
+      "command": ["npm", "run", "format:check", "--if-present"]
+    },
+    { "name": "deploy", "command": ["git", "status", "--short"] }
+  ]
+}
