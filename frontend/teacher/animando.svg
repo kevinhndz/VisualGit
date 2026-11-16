@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 190" role="img" aria-label="Profesor celebrando">
+  <style>
+    .blink { transform-origin: center; animation: blink 6s infinite; }
+    @keyframes blink { 0%, 95%, 100% { transform: scaleY(1); } 97% { transform: scaleY(.12); } }
+    @media (prefers-reduced-motion: reduce) { .blink { animation: none; } }
+  </style>
+  <g stroke="#424b58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M48 179h66l-8-60-17-11H72l-17 11z" fill="#8da9a2"/>
+    <path d="M68 113l12 17 12-17" fill="#e9bd6a"/>
+    <path d="M56 124 30 151l-7-4m80-23 23-16 8 5" fill="none"/>
+    <path d="M20 144q-3-8 4-10l8 5 1 9-7 4zM132 112l-3-11 2-12 7-2 3 9 5 2-3 14z" fill="#d8a98b"/>
+    <path d="M54 60q-7-33 26-39 31-1 30 40v23q-2 27-29 31-26-4-28-31z" fill="#d8a98b"/>
+    <path d="M50 64q-5-23 6-37 13-17 36-11 24 7 20 35-12-3-17-16-14 12-45 14z" fill="#394252"/>
+    <path d="M59 70h18m7 0h18" fill="none"/>
+    <circle cx="68" cy="74" r="11" fill="none"/><circle cx="94" cy="74" r="11" fill="none"/>
+    <g class="blink" fill="#303842" stroke="none"><ellipse cx="68" cy="74" rx="2" ry="3"/><ellipse cx="94" cy="74" rx="2" ry="3"/></g>
+    <path d="M80 79l-2 8 5 1m-11 8q8 10 18 0" fill="none"/>
+    <path d="M64 178v-18m32 18v-18" fill="none"/>
+    <path d="M120 50l3-7m14 10 5-5m-6 17 8 1" fill="none" stroke="#e9bd6a"/>
+  </g>
+</svg>
