@@ -1,0 +1,865 @@
+[
+  {
+    "id": "push-rejected",
+    "match": ["non-fast-forward", "failed to push some refs", "fetch first"],
+    "categoria": "push",
+    "titulo": "Git rechazó el push",
+    "que_paso": "El servidor tiene cambios que tu rama todavía no tiene.",
+    "por_que": "Alguien subió commits antes que tú. Git evita sobrescribirlos.",
+    "pasos": [
+      { "texto": "Mira tu rama.", "comando": "git status" },
+      { "texto": "Descarga lo nuevo.", "comando": "git fetch origin" },
+      {
+        "texto": "Integra la rama remota correspondiente y resuelve cualquier conflicto.",
+        "comando": ""
+      },
+      { "texto": "Vuelve a enviar tus cambios.", "comando": "git push" }
+    ],
+    "como_evitarlo": "Actualiza tu rama antes de subir cambios.",
+    "escena": "push"
+  },
+  {
+    "id": "merge-conflict",
+    "match": [
+      "automatic merge failed",
+      "merge conflict in",
+      "you have unmerged paths"
+    ],
+    "categoria": "merge",
+    "titulo": "Hay un conflicto al unir ramas",
+    "que_paso": "Git encontró dos cambios en el mismo lugar y necesita tu decisión.",
+    "por_que": "En el archivo, <<<<<<< marca una versión, ======= las separa y >>>>>>> marca la otra. A veces la solución es conservar ambas partes.",
+    "pasos": [
+      {
+        "texto": "Consulta los archivos en conflicto.",
+        "comando": "git status"
+      },
+      {
+        "texto": "Edita el contenido final y quita las marcas de conflicto.",
+        "comando": ""
+      },
+      { "texto": "Prepara lo resuelto.", "comando": "git add ." },
+      { "texto": "Termina la unión.", "comando": "git merge --continue" }
+    ],
+    "como_evitarlo": "Actualiza tu rama y revisa los cambios antes de unirlos.",
+    "escena": "merge"
+  },
+  {
+    "id": "rebase-conflict",
+    "match": [
+      "could not apply.*rebase",
+      "resolve all conflicts manually.*rebase",
+      "rebase.*conflict"
+    ],
+    "categoria": "rebase",
+    "titulo": "Un rebase encontró un conflicto",
+    "que_paso": "Git se detuvo mientras volvía a aplicar commits.",
+    "por_que": "Las dos versiones modificaron la misma zona. Las marcas <<<<<<<, ======= y >>>>>>> separan las partes; puedes conservar ambas.",
+    "pasos": [
+      { "texto": "Revisa los archivos.", "comando": "git status" },
+      {
+        "texto": "Edita el resultado y prepara los archivos.",
+        "comando": "git add ."
+      },
+      { "texto": "Continúa el rebase.", "comando": "git rebase --continue" }
+    ],
+    "como_evitarlo": "Actualiza la rama antes de empezar el rebase.",
+    "escena": "merge"
+  },
+  {
+    "id": "cherry-pick-conflict",
+    "match": [
+      "cherry-pick is now empty",
+      "could not apply.*cherry-pick",
+      "cherry-pick.*conflict"
+    ],
+    "categoria": "cherry-pick",
+    "titulo": "Cherry-pick necesita una decisión",
+    "que_paso": "El commit no pudo aplicarse por completo.",
+    "por_que": "Hay cambios incompatibles. Revisa <<<<<<<, ======= y >>>>>>>; puedes conservar ambas partes.",
+    "pasos": [
+      { "texto": "Mira el estado.", "comando": "git status" },
+      { "texto": "Resuelve y prepara los archivos.", "comando": "git add ." },
+      {
+        "texto": "Continúa la operación.",
+        "comando": "git cherry-pick --continue"
+      }
+    ],
+    "como_evitarlo": "Comprueba qué archivos toca el commit antes de traerlo.",
+    "escena": "merge"
+  },
+  {
+    "id": "stash-conflict",
+    "match": ["stash.*conflict", "conflict.*stash", "stash entry is kept"],
+    "categoria": "stash",
+    "titulo": "Tu stash dejó conflictos",
+    "que_paso": "Git no pudo aplicar todos los cambios guardados.",
+    "por_que": "El trabajo actual y el stash tocaron las mismas líneas. <<<<<<<, ======= y >>>>>>> muestran ambas versiones; puedes conservar ambas.",
+    "pasos": [
+      { "texto": "Mira qué falta resolver.", "comando": "git status" },
+      {
+        "texto": "Edita los archivos y prepara el resultado.",
+        "comando": "git add ."
+      },
+      {
+        "texto": "Si usaste stash pop, revisa si el stash sigue guardado.",
+        "comando": "git stash list"
+      }
+    ],
+    "como_evitarlo": "Revisa el estado antes de recuperar un stash.",
+    "escena": "merge"
+  },
+  {
+    "id": "nothing-to-commit",
+    "match": ["nothing to commit", "no changes added to commit"],
+    "categoria": "commit",
+    "titulo": "No hay cambios para guardar",
+    "que_paso": "Git no encontró cambios preparados para el commit.",
+    "por_que": "Quizá no cambiaste archivos o todavía no usaste git add.",
+    "pasos": [
+      { "texto": "Mira qué archivos cambiaron.", "comando": "git status" },
+      {
+        "texto": "Prepara los archivos que quieras guardar.",
+        "comando": "git add ."
+      }
+    ],
+    "como_evitarlo": "Revisa el estado antes de hacer commit.",
+    "escena": "add"
+  },
+  {
+    "id": "untracked-files",
+    "match": [
+      "untracked files",
+      "nothing added to commit but untracked files present"
+    ],
+    "categoria": "add",
+    "titulo": "Hay archivos nuevos sin preparar",
+    "que_paso": "Git ve archivos nuevos, pero todavía no forman parte del commit.",
+    "por_que": "Un archivo nuevo necesita git add para entrar en staging.",
+    "pasos": [
+      { "texto": "Identifica los archivos nuevos.", "comando": "git status" },
+      {
+        "texto": "Prepara el archivo deseado.",
+        "comando": "git add nombre-del-archivo"
+      }
+    ],
+    "como_evitarlo": "Mira la lista de archivos antes de crear el commit.",
+    "escena": "add"
+  },
+  {
+    "id": "detached-head",
+    "match": ["detached head", "you are not currently on a branch"],
+    "categoria": "rama",
+    "titulo": "Estás fuera de una rama",
+    "que_paso": "HEAD apunta a un commit concreto.",
+    "por_que": "Los nuevos commits pueden ser difíciles de encontrar si cambias de lugar.",
+    "pasos": [
+      { "texto": "Revisa dónde estás.", "comando": "git status" },
+      {
+        "texto": "Crea una rama si quieres guardar tu trabajo.",
+        "comando": "git switch -c mi-rama"
+      }
+    ],
+    "como_evitarlo": "Comprueba el nombre de la rama antes de hacer commits.",
+    "escena": "branch"
+  },
+  {
+    "id": "not-repository",
+    "match": ["not a git repository"],
+    "categoria": "repositorio",
+    "titulo": "Esta carpeta no es un repositorio Git",
+    "que_paso": "Git no encontró .git en esta carpeta ni arriba de ella.",
+    "por_que": "El comando se ejecutó fuera del proyecto.",
+    "pasos": [
+      { "texto": "Comprueba dónde estás.", "comando": "pwd" },
+      {
+        "texto": "Entra en la carpeta del proyecto y revisa el estado.",
+        "comando": "git status"
+      }
+    ],
+    "como_evitarlo": "Abre la terminal dentro del proyecto.",
+    "escena": "repo"
+  },
+  {
+    "id": "pathspec",
+    "match": [
+      "pathspec .* did not match",
+      "unknown revision or path not in the working tree"
+    ],
+    "categoria": "ruta",
+    "titulo": "Git no encontró ese nombre",
+    "que_paso": "La ruta o rama escrita no coincide con una que Git conoce.",
+    "por_que": "Puede haber un error de escritura o el archivo aún no existe.",
+    "pasos": [
+      {
+        "texto": "Revisa archivos y ramas disponibles.",
+        "comando": "git status"
+      },
+      { "texto": "Mira las ramas.", "comando": "git branch -a" }
+    ],
+    "como_evitarlo": "Copia el nombre exacto antes de usarlo.",
+    "escena": "repo"
+  },
+  {
+    "id": "author-unknown",
+    "match": [
+      "author identity unknown",
+      "please tell me who you are",
+      "unable to auto-detect email address"
+    ],
+    "categoria": "commit",
+    "titulo": "Git no conoce tu nombre",
+    "que_paso": "No puede firmar el commit porque faltan nombre o correo.",
+    "por_que": "Cada commit necesita identificar a su autor.",
+    "pasos": [
+      {
+        "texto": "Configura tu nombre.",
+        "comando": "git config user.name \"Tu nombre\""
+      },
+      {
+        "texto": "Configura tu correo.",
+        "comando": "git config user.email \"tu@correo.com\""
+      }
+    ],
+    "como_evitarlo": "Configura tu identidad al preparar una máquina nueva.",
+    "escena": "repo"
+  },
+  {
+    "id": "auth-failed",
+    "match": [
+      "authentication failed",
+      "invalid username or password",
+      "could not read username"
+    ],
+    "categoria": "acceso",
+    "titulo": "No se pudo iniciar sesión",
+    "que_paso": "El remoto no aceptó tus credenciales.",
+    "por_que": "La sesión o el token pueden estar vencidos.",
+    "pasos": [
+      {
+        "texto": "Comprueba tu sesión de GitHub.",
+        "comando": "gh auth status"
+      },
+      {
+        "texto": "Inicia sesión de nuevo si hace falta.",
+        "comando": "gh auth login"
+      }
+    ],
+    "como_evitarlo": "Revisa tu sesión antes de subir cambios.",
+    "escena": "push"
+  },
+  {
+    "id": "publickey",
+    "match": ["permission denied \\(publickey\\)"],
+    "categoria": "acceso",
+    "titulo": "La clave SSH fue rechazada",
+    "que_paso": "El servidor no reconoció tu clave SSH.",
+    "por_que": "La clave puede faltar en tu cuenta o no estar cargada.",
+    "pasos": [
+      {
+        "texto": "Revisa la dirección del remoto.",
+        "comando": "git remote -v"
+      },
+      {
+        "texto": "Comprueba tu acceso SSH con GitHub.",
+        "comando": "ssh -T git@github.com"
+      }
+    ],
+    "como_evitarlo": "Configura y prueba la clave SSH antes de trabajar con el remoto.",
+    "escena": "push"
+  },
+  {
+    "id": "local-overwritten",
+    "match": [
+      "local changes to the following files would be overwritten",
+      "untracked working tree files would be overwritten"
+    ],
+    "categoria": "cambios",
+    "titulo": "Hay cambios locales que se perderían",
+    "que_paso": "Git detuvo el cambio de rama o la unión para proteger tus archivos.",
+    "por_que": "El nuevo contenido reemplazaría trabajo sin guardar.",
+    "pasos": [
+      { "texto": "Revisa tus cambios.", "comando": "git status" },
+      {
+        "texto": "Haz commit o guarda temporalmente lo que necesites.",
+        "comando": "git stash push"
+      },
+      {
+        "texto": "Repite la operación cuando el estado esté claro.",
+        "comando": ""
+      }
+    ],
+    "como_evitarlo": "Termina o guarda tu trabajo antes de cambiar de rama.",
+    "escena": "branch"
+  },
+  {
+    "id": "unrelated-histories",
+    "match": ["refusing to merge unrelated histories"],
+    "categoria": "merge",
+    "titulo": "Las ramas no comparten historia",
+    "que_paso": "Git no reconoce un origen común entre ambas historias.",
+    "por_que": "Quizá se crearon como repositorios independientes.",
+    "pasos": [
+      {
+        "texto": "Comprueba que elegiste el repositorio y la rama correctos.",
+        "comando": "git remote -v"
+      },
+      {
+        "texto": "Mira el historial antes de decidir si debes unirlos.",
+        "comando": "git log --oneline -5"
+      }
+    ],
+    "como_evitarlo": "Crea ramas desde el mismo repositorio base.",
+    "escena": "merge"
+  },
+  {
+    "id": "branch-exists",
+    "match": ["a branch named .* already exists", "branch .* already exists"],
+    "categoria": "rama",
+    "titulo": "Esa rama ya existe",
+    "que_paso": "Git no creó otra rama con el mismo nombre.",
+    "por_que": "Dos ramas locales no pueden compartir nombre.",
+    "pasos": [
+      { "texto": "Mira las ramas disponibles.", "comando": "git branch -a" },
+      {
+        "texto": "Cambia a la rama existente si es la que quieres.",
+        "comando": "git switch nombre-de-rama"
+      }
+    ],
+    "como_evitarlo": "Consulta las ramas antes de crear una nueva.",
+    "escena": "branch"
+  },
+  {
+    "id": "branch-unmerged",
+    "match": ["branch .* is not fully merged"],
+    "categoria": "rama",
+    "titulo": "La rama aún tiene trabajo sin unir",
+    "que_paso": "Git impidió borrarla de forma normal.",
+    "por_que": "Podrías perder commits que no están en tu rama actual.",
+    "pasos": [
+      {
+        "texto": "Revisa los commits de esa rama.",
+        "comando": "git log --oneline nombre-de-rama"
+      },
+      { "texto": "Únela si esos cambios deben conservarse.", "comando": "" }
+    ],
+    "como_evitarlo": "Comprueba el historial antes de borrar una rama.",
+    "escena": "branch"
+  },
+  {
+    "id": "branch-current",
+    "match": [
+      "cannot delete branch .* checked out",
+      "cannot delete the branch .* which you are currently on"
+    ],
+    "categoria": "rama",
+    "titulo": "No puedes borrar la rama actual",
+    "que_paso": "Estás usando la rama que intentaste borrar.",
+    "por_que": "Git necesita que cambies a otra rama primero.",
+    "pasos": [
+      { "texto": "Cambia a otra rama.", "comando": "git switch main" },
+      {
+        "texto": "Después revisa si la rama se puede borrar.",
+        "comando": "git branch -d nombre-de-rama"
+      }
+    ],
+    "como_evitarlo": "Mira la rama activa antes de borrar una.",
+    "escena": "branch"
+  },
+  {
+    "id": "no-upstream",
+    "match": ["has no upstream branch", "no upstream configured"],
+    "categoria": "push",
+    "titulo": "Tu rama no tiene destino remoto",
+    "que_paso": "Git no sabe a dónde enviar esta rama.",
+    "por_que": "La rama local todavía no está conectada con una rama remota.",
+    "pasos": [
+      {
+        "texto": "Comprueba la rama activa.",
+        "comando": "git branch --show-current"
+      },
+      {
+        "texto": "Envía la rama y fija su destino.",
+        "comando": "git push -u origin nombre-de-rama"
+      }
+    ],
+    "como_evitarlo": "Usa -u la primera vez que subas una rama.",
+    "escena": "push"
+  },
+  {
+    "id": "remote-exists",
+    "match": ["remote origin already exists"],
+    "categoria": "remoto",
+    "titulo": "Origin ya está configurado",
+    "que_paso": "Git no añadió otro remoto con el mismo nombre.",
+    "por_que": "El nombre origin ya pertenece a una dirección.",
+    "pasos": [
+      { "texto": "Mira la dirección actual.", "comando": "git remote -v" },
+      {
+        "texto": "Si debe cambiar, actualízala después de confirmarlo.",
+        "comando": "git remote set-url origin URL"
+      }
+    ],
+    "como_evitarlo": "Consulta los remotos antes de añadir uno.",
+    "escena": "push"
+  },
+  {
+    "id": "repo-not-found",
+    "match": ["repository not found", "remote: not found"],
+    "categoria": "remoto",
+    "titulo": "No se encontró el repositorio remoto",
+    "que_paso": "La dirección remota no llevó a un repositorio accesible.",
+    "por_que": "La URL puede estar mal o tu cuenta no tiene permiso.",
+    "pasos": [
+      { "texto": "Revisa la dirección.", "comando": "git remote -v" },
+      {
+        "texto": "Comprueba tus permisos en GitHub.",
+        "comando": "gh auth status"
+      }
+    ],
+    "como_evitarlo": "Copia la URL del repositorio desde GitHub.",
+    "escena": "push"
+  },
+  {
+    "id": "large-file",
+    "match": [
+      "is larger than",
+      "exceeds github's file size limit",
+      "pre-receive hook declined.*large"
+    ],
+    "categoria": "push",
+    "titulo": "Un archivo es demasiado grande",
+    "que_paso": "El servidor rechazó un archivo por su tamaño.",
+    "por_que": "El remoto limita el tamaño de los archivos Git.",
+    "pasos": [
+      { "texto": "Identifica el archivo en el error original.", "comando": "" },
+      {
+        "texto": "Sácalo del commit o usa una solución para archivos grandes si tu equipo la permite.",
+        "comando": ""
+      }
+    ],
+    "como_evitarlo": "Evita guardar binarios grandes en Git normal.",
+    "escena": "push"
+  },
+  {
+    "id": "ignored-file",
+    "match": [
+      "following paths are ignored by one of your .gitignore files",
+      "is ignored by one of your .gitignore files"
+    ],
+    "categoria": "add",
+    "titulo": "Ese archivo está ignorado",
+    "que_paso": "Git no lo añadió porque coincide con .gitignore.",
+    "por_que": "El proyecto decidió excluir esa ruta.",
+    "pasos": [
+      {
+        "texto": "Consulta la regla que lo ignora.",
+        "comando": "git check-ignore -v nombre-del-archivo"
+      },
+      {
+        "texto": "Cambia .gitignore solo si el equipo quiere versionarlo.",
+        "comando": ""
+      }
+    ],
+    "como_evitarlo": "Revisa .gitignore antes de añadir archivos generados.",
+    "escena": "add"
+  },
+  {
+    "id": "index-lock",
+    "match": ["index.lock.*exists", "unable to create .*index.lock"],
+    "categoria": "repositorio",
+    "titulo": "Git encontró un bloqueo",
+    "que_paso": "Otro proceso puede estar usando el índice del repositorio.",
+    "por_que": "Git crea index.lock para evitar escrituras al mismo tiempo.",
+    "pasos": [
+      { "texto": "Espera o cierra la otra operación Git.", "comando": "" },
+      {
+        "texto": "Comprueba el estado antes de tocar el bloqueo.",
+        "comando": "git status"
+      }
+    ],
+    "como_evitarlo": "No ejecutes dos operaciones de escritura a la vez.",
+    "escena": "repo"
+  },
+  {
+    "id": "corrupt-object",
+    "match": [
+      "object file .* is empty",
+      "loose object .* is corrupt",
+      "bad object [0-9a-f]+"
+    ],
+    "categoria": "repositorio",
+    "titulo": "Hay un objeto Git dañado",
+    "que_paso": "Git no pudo leer parte del historial.",
+    "por_que": "Un archivo interno pudo dañarse o quedar incompleto.",
+    "pasos": [
+      {
+        "texto": "Revisa la integridad sin cambiar archivos.",
+        "comando": "git fsck --full"
+      },
+      {
+        "texto": "Conserva una copia del repositorio y busca un respaldo o clon sano.",
+        "comando": ""
+      }
+    ],
+    "como_evitarlo": "Mantén respaldos del repositorio y evita interrumpir escrituras.",
+    "escena": "repo"
+  },
+  {
+    "id": "rebase-in-progress",
+    "match": ["rebase-merge directory", "you are currently rebasing"],
+    "categoria": "rebase",
+    "titulo": "Ya hay un rebase pendiente",
+    "que_paso": "Git está a mitad de reorganizar commits.",
+    "por_que": "Debes terminar o cancelar esa operación antes de iniciar otra.",
+    "pasos": [
+      { "texto": "Revisa el estado.", "comando": "git status" },
+      {
+        "texto": "Continúa después de resolver los archivos.",
+        "comando": "git rebase --continue"
+      },
+      {
+        "texto": "Si quieres volver atrás, cancela.",
+        "comando": "git rebase --abort"
+      }
+    ],
+    "como_evitarlo": "Termina una operación antes de empezar otra.",
+    "escena": "merge"
+  },
+  {
+    "id": "revert-conflict",
+    "match": ["revert.*conflict", "could not revert", "revert is now empty"],
+    "categoria": "revert",
+    "titulo": "Revert encontró un conflicto",
+    "que_paso": "Git no pudo deshacer ese commit automáticamente.",
+    "por_que": "Otros cambios tocaron las mismas líneas. Las marcas <<<<<<<, ======= y >>>>>>> muestran las partes; puedes conservar ambas.",
+    "pasos": [
+      { "texto": "Mira los archivos.", "comando": "git status" },
+      { "texto": "Resuelve y prepara el resultado.", "comando": "git add ." },
+      { "texto": "Continúa el revert.", "comando": "git revert --continue" }
+    ],
+    "como_evitarlo": "Revisa los cambios posteriores antes de revertir.",
+    "escena": "merge"
+  },
+  {
+    "id": "revert-merge-parent",
+    "match": ["is a merge but no -m option was given"],
+    "categoria": "revert",
+    "titulo": "Debes elegir la línea principal del merge",
+    "que_paso": "Git no sabe qué padre del merge conservar.",
+    "por_que": "Un merge tiene más de un commit padre.",
+    "pasos": [
+      {
+        "texto": "Mira los padres del merge.",
+        "comando": "git show --no-patch --pretty=%P HASH"
+      },
+      {
+        "texto": "Si conoces cuál conservar, repite con -m y ese número.",
+        "comando": "git revert -m 1 HASH"
+      }
+    ],
+    "como_evitarlo": "Comprueba los padres antes de revertir un merge.",
+    "escena": "merge"
+  },
+  {
+    "id": "reset-hard-warning",
+    "match": [
+      "reset --hard.*would overwrite",
+      "would be overwritten by reset",
+      "reset --hard.*warning"
+    ],
+    "categoria": "cambios",
+    "titulo": "Reset puede borrar trabajo local",
+    "que_paso": "La operación puede descartar cambios sin guardar.",
+    "por_que": "--hard reemplaza el índice y los archivos de trabajo.",
+    "pasos": [
+      { "texto": "Revisa el estado primero.", "comando": "git status" },
+      {
+        "texto": "Guarda una copia de lo que quieras conservar.",
+        "comando": ""
+      }
+    ],
+    "como_evitarlo": "Lee el efecto de --hard antes de usarlo.",
+    "escena": "repo"
+  },
+  {
+    "id": "unknown-command",
+    "match": ["git: '[^']+' is not a git command", "did you mean this"],
+    "categoria": "comando",
+    "titulo": "Git no reconoce ese comando",
+    "que_paso": "El nombre del comando puede tener un error de escritura.",
+    "por_que": "Git solo acepta comandos conocidos; a veces muestra una sugerencia.",
+    "pasos": [
+      {
+        "texto": "Lee la sugerencia de Git y corrige el nombre.",
+        "comando": "git help"
+      }
+    ],
+    "como_evitarlo": "Comprueba la escritura del comando antes de ejecutarlo.",
+    "escena": "repo"
+  },
+  {
+    "id": "unknown-option",
+    "match": ["unknown option", "unrecognized option", "unknown switch"],
+    "categoria": "comando",
+    "titulo": "Git no reconoce esa opción",
+    "que_paso": "El comando recibió una bandera desconocida.",
+    "por_que": "La opción puede estar mal escrita o no pertenecer a ese comando.",
+    "pasos": [
+      { "texto": "Consulta la ayuda del comando.", "comando": "git help" }
+    ],
+    "como_evitarlo": "Copia las opciones desde la ayuda del comando.",
+    "escena": "repo"
+  },
+  {
+    "id": "empty-message",
+    "match": [
+      "aborting commit due to empty commit message",
+      "empty commit message"
+    ],
+    "categoria": "commit",
+    "titulo": "Falta el mensaje del commit",
+    "que_paso": "Git canceló el commit porque el mensaje estaba vacío.",
+    "por_que": "El mensaje permite reconocer el cambio más adelante.",
+    "pasos": [
+      {
+        "texto": "Escribe un mensaje claro y repite el commit.",
+        "comando": "git commit -m \"Explicar el cambio\""
+      }
+    ],
+    "como_evitarlo": "Prepara una frase breve antes de crear el commit.",
+    "escena": "repo"
+  },
+  {
+    "id": "editor-failed",
+    "match": [
+      "there was a problem with the editor",
+      "terminal is dumb, but editor unset",
+      "unable to start editor"
+    ],
+    "categoria": "commit",
+    "titulo": "Git no pudo abrir el editor",
+    "que_paso": "La herramienta para escribir el mensaje no se inició.",
+    "por_que": "El editor configurado puede faltar o no funcionar en esta terminal.",
+    "pasos": [
+      {
+        "texto": "Puedes dar el mensaje en el comando.",
+        "comando": "git commit -m \"Explicar el cambio\""
+      },
+      {
+        "texto": "Revisa la configuración del editor.",
+        "comando": "git config --get core.editor"
+      }
+    ],
+    "como_evitarlo": "Configura un editor disponible en tu equipo.",
+    "escena": "repo"
+  },
+  {
+    "id": "line-endings",
+    "match": [
+      "lf will be replaced by crlf",
+      "crlf will be replaced by lf",
+      "line endings will be replaced"
+    ],
+    "categoria": "aviso",
+    "titulo": "Git avisó sobre finales de línea",
+    "que_paso": "El formato de salto de línea puede cambiar al guardar el archivo.",
+    "por_que": "Windows y Unix suelen usar finales de línea diferentes.",
+    "pasos": [
+      {
+        "texto": "Revisa la configuración del proyecto.",
+        "comando": "git config --get core.autocrlf"
+      },
+      { "texto": "Consulta .gitattributes antes de cambiarla.", "comando": "" }
+    ],
+    "como_evitarlo": "Acuerda una política de finales de línea con el equipo.",
+    "escena": "repo"
+  },
+  {
+    "id": "shallow-clone",
+    "match": [
+      "shallow update not allowed",
+      "shallow file has changed",
+      "not a complete object name.*shallow"
+    ],
+    "categoria": "historial",
+    "titulo": "El clon tiene historial limitado",
+    "que_paso": "Git no tiene los commits antiguos que necesita.",
+    "por_que": "El repositorio se clonó con profundidad reducida.",
+    "pasos": [
+      {
+        "texto": "Comprueba si es un clon superficial.",
+        "comando": "git rev-parse --is-shallow-repository"
+      },
+      {
+        "texto": "Si hace falta, descarga el historial completo.",
+        "comando": "git fetch --unshallow"
+      }
+    ],
+    "como_evitarlo": "Usa un clon completo cuando necesites todo el historial.",
+    "escena": "repo"
+  },
+  {
+    "id": "submodule",
+    "match": [
+      "no submodule mapping found",
+      "failed to clone .* submodule",
+      "unable to checkout submodule"
+    ],
+    "categoria": "submódulo",
+    "titulo": "Falló un submódulo",
+    "que_paso": "Git no pudo descargar o colocar un repositorio incluido.",
+    "por_que": "La dirección, permisos o referencia del submódulo pueden faltar.",
+    "pasos": [
+      {
+        "texto": "Revisa el estado de los submódulos.",
+        "comando": "git submodule status"
+      },
+      { "texto": "Comprueba .gitmodules y tus permisos.", "comando": "" }
+    ],
+    "como_evitarlo": "Verifica los submódulos al clonar el proyecto.",
+    "escena": "repo"
+  },
+  {
+    "id": "http-403",
+    "match": ["http (?:error )?403", "requested url returned error: 403"],
+    "categoria": "red",
+    "titulo": "El servidor negó el acceso (403)",
+    "que_paso": "La solicitud llegó, pero no tienes permiso.",
+    "por_que": "Tu sesión o permisos pueden faltar.",
+    "pasos": [
+      { "texto": "Comprueba tu sesión.", "comando": "gh auth status" },
+      { "texto": "Pide acceso si el repositorio es privado.", "comando": "" }
+    ],
+    "como_evitarlo": "Revisa permisos antes de trabajar con un remoto privado.",
+    "escena": "push"
+  },
+  {
+    "id": "http-404",
+    "match": ["http (?:error )?404", "requested url returned error: 404"],
+    "categoria": "red",
+    "titulo": "El servidor no encontró la ruta (404)",
+    "que_paso": "La dirección solicitada no existe o no es visible para ti.",
+    "por_que": "La URL puede estar mal o faltar acceso.",
+    "pasos": [{ "texto": "Revisa el remoto.", "comando": "git remote -v" }],
+    "como_evitarlo": "Copia la URL correcta del repositorio.",
+    "escena": "push"
+  },
+  {
+    "id": "http-500",
+    "match": [
+      "http (?:error )?5[0-9]{2}",
+      "requested url returned error: 5[0-9]{2}"
+    ],
+    "categoria": "red",
+    "titulo": "El servidor tuvo un problema",
+    "que_paso": "El servicio remoto respondió con un error interno.",
+    "por_que": "Puede ser temporal o requerir atención del servicio.",
+    "pasos": [
+      {
+        "texto": "Comprueba que tu trabajo local está guardado.",
+        "comando": "git status"
+      },
+      { "texto": "Espera y vuelve a intentar más tarde.", "comando": "" }
+    ],
+    "como_evitarlo": "Mantén tus cambios confirmados localmente.",
+    "escena": "push"
+  },
+  {
+    "id": "network-dns",
+    "match": [
+      "could not resolve host",
+      "network is unreachable",
+      "could not resolve proxy"
+    ],
+    "categoria": "red",
+    "titulo": "No se pudo llegar al servidor",
+    "que_paso": "Git no pudo conectar con el remoto.",
+    "por_que": "Puede faltar internet, DNS o acceso al servidor.",
+    "pasos": [
+      {
+        "texto": "Comprueba tu conexión y el remoto.",
+        "comando": "git remote -v"
+      },
+      { "texto": "Repite cuando tengas conexión.", "comando": "" }
+    ],
+    "como_evitarlo": "Trabaja localmente y sube los commits cuando vuelva la conexión.",
+    "escena": "push"
+  },
+  {
+    "id": "ci-build",
+    "match": ["ci:build failed", "build step failed", "npm run build.*failed"],
+    "categoria": "ci",
+    "titulo": "Falló la compilación",
+    "que_paso": "El paso build terminó con error.",
+    "por_que": "El código no pudo prepararse para ejecutarse.",
+    "pasos": [
+      {
+        "texto": "Lee el log de build y corrige el primer error.",
+        "comando": ""
+      },
+      { "texto": "Ejecuta el paso de nuevo antes de integrar.", "comando": "" }
+    ],
+    "como_evitarlo": "Compila localmente antes de subir el cambio.",
+    "escena": "ci"
+  },
+  {
+    "id": "ci-tests",
+    "match": ["ci:tests failed", "tests step failed", "pytest.*failed"],
+    "categoria": "ci",
+    "titulo": "Fallaron las pruebas",
+    "que_paso": "Una prueba detectó un comportamiento distinto al esperado.",
+    "por_que": "El cambio puede romper una parte de la aplicación.",
+    "pasos": [
+      { "texto": "Lee el nombre de la prueba y el error.", "comando": "" },
+      {
+        "texto": "Corrige el código y vuelve a ejecutar las pruebas.",
+        "comando": ""
+      }
+    ],
+    "como_evitarlo": "Ejecuta las pruebas antes de integrar la rama.",
+    "escena": "ci"
+  },
+  {
+    "id": "ci-lint",
+    "match": ["ci:lint failed", "lint step failed", "eslint.*failed"],
+    "categoria": "ci",
+    "titulo": "Falló la revisión de estilo",
+    "que_paso": "La herramienta lint encontró un problema.",
+    "por_que": "El código no cumple una regla acordada por el proyecto.",
+    "pasos": [
+      {
+        "texto": "Lee el archivo y la línea indicados en el log.",
+        "comando": ""
+      },
+      { "texto": "Corrige el aviso y repite lint.", "comando": "" }
+    ],
+    "como_evitarlo": "Ejecuta lint antes de subir cambios.",
+    "escena": "ci"
+  },
+  {
+    "id": "pr-not-mergeable",
+    "match": [
+      "pull request is not mergeable",
+      "merge state status: dirty",
+      "pr not mergeable"
+    ],
+    "categoria": "pr",
+    "titulo": "El PR tiene un conflicto",
+    "que_paso": "La rama del PR no se puede unir todavía.",
+    "por_que": "La rama de destino y la tuya cambiaron partes incompatibles.",
+    "pasos": [
+      { "texto": "Trae los cambios recientes.", "comando": "git fetch origin" },
+      {
+        "texto": "Integra la rama de destino en tu rama y resuelve los conflictos.",
+        "comando": ""
+      },
+      {
+        "texto": "Sube la rama corregida; el mismo PR se actualizará.",
+        "comando": "git push"
+      }
+    ],
+    "como_evitarlo": "Mantén tu rama actualizada mientras el PR esté abierto.",
+    "escena": "merge"
+  }
+]
