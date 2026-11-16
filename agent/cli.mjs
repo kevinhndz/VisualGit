@@ -49,6 +49,12 @@ function runningPid() {
   }
 }
 
+function currentPairCode(config) {
+  return existsSync(pairPath)
+    ? readFileSync(pairPath, "utf8").trim()
+    : config.token;
+}
+
 function stop() {
   const pid = runningPid();
   if (!pid) {
@@ -77,6 +83,9 @@ switch (command) {
     const pid = runningPid();
     if (pid) {
       console.log(`El agente ya esta iniciado (PID ${pid}).`);
+      console.log(
+        `Abre http://127.0.0.1:${config.port} y pega el codigo: ${currentPairCode(config)}`,
+      );
       break;
     }
     ensureDirectories();
@@ -108,9 +117,7 @@ switch (command) {
   case "token": {
     const config = loadConfig();
     if (!config) throw new Error("Git Visual no esta instalado.");
-    console.log(
-      existsSync(pairPath) ? readFileSync(pairPath, "utf8") : config.token,
-    );
+    console.log(currentPairCode(config));
     break;
   }
   case "allow-origin": {

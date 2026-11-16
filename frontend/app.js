@@ -10,6 +10,7 @@ import { demoSteps, freshDemo } from "./simulator.js";
 import { setupModules } from "./modules.js";
 
 const byId = (id) => document.getElementById(id);
+const savedSessionKey = "gitviz-session";
 const modules = setupModules();
 function updateNetworkStatus() {
   byId("network-status").textContent = navigator.onLine
@@ -117,9 +118,14 @@ async function connect() {
   button.disabled = true;
   button.textContent = "Conectando...";
   try {
-    await client.connect(base, token);
+    const { session, expires } = await client.connect(base, token);
     clearTimeline();
     localStorage.setItem("gitviz-agent", base);
+    sessionStorage.setItem(
+      savedSessionKey,
+      JSON.stringify({ base: client.base, session, expires }),
+    );
+    byId("pair-token").value = "";
   } catch (error) {
     setStatus("disconnected");
     byId("connect-error").textContent =
@@ -132,11 +138,26 @@ async function connect() {
   }
 }
 
+async function resumeSession() {
+  const saved = sessionStorage.getItem(savedSessionKey);
+  if (!saved) return;
+  try {
+    const { base, session, expires } = JSON.parse(saved);
+    if (!base || !session || expires <= Date.now()) throw new Error();
+    byId("agent-url").value = base;
+    await client.resume(base, session);
+  } catch {
+    sessionStorage.removeItem(savedSessionKey);
+    setStatus("disconnected");
+  }
+}
+
 function startDemo() {
   clearTimeline();
   generation++;
   queue.length = 0;
   client.disconnect();
+  sessionStorage.removeItem(savedSessionKey);
   clearInterval(demoTimer);
   setStatus("demo");
   demo = freshDemo();
@@ -296,3 +317,4 @@ currentSnapshot = {
 };
 renderSnapshot(currentSnapshot);
 setStatus("disconnected");
+void resumeSession();

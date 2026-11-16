@@ -6,19 +6,17 @@ export class AgentClient {
     this.retry = null;
     this.session = null;
     this.base = "";
-    this.token = "";
   }
 
   async connect(base, token) {
     this.disconnect();
     this.base = base.replace(/\/+$/, "");
-    this.token = token.trim();
-    if (!this.token) throw new Error("Escribe el codigo de emparejamiento.");
+    if (!token.trim()) throw new Error("Escribe el codigo de emparejamiento.");
     const response = await fetch(`${this.base}/api/pair`, {
       method: "POST",
       mode: "cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: this.token }),
+      body: JSON.stringify({ token: token.trim() }),
     });
     if (!response.ok) {
       if (response.status === 403)
@@ -33,6 +31,21 @@ export class AgentClient {
     this.session = data.session;
     this.openEvents();
     return data;
+  }
+
+  async resume(base, session) {
+    this.disconnect();
+    this.base = base.replace(/\/+$/, "");
+    const response = await fetch(`${this.base}/api/session`, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session }),
+    });
+    if (!response.ok) throw new Error("La sesion ya no esta disponible.");
+    this.session = session;
+    this.openEvents();
+    return response.json();
   }
 
   openEvents() {

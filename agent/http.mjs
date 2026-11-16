@@ -29,23 +29,24 @@ function readBody(request) {
 }
 
 export function createAgentHttp({ config, hub, frontendDir, root }) {
+  const pairingDuration = 60 * 60 * 1000;
   const websockets = new WebSocketServer({ noServer: true });
   const sessions = new Map();
   let pairCode = config.token;
-  let pairExpires = Date.now() + 5 * 60 * 1000;
+  let pairExpires = Date.now() + pairingDuration;
   let wrongAttempts = 0;
   let expiryTimer;
   const renewCode = () => {
     pairCode = String(randomInt(1000000)).padStart(6, "0");
-    pairExpires = Date.now() + 5 * 60 * 1000;
+    pairExpires = Date.now() + pairingDuration;
     wrongAttempts = 0;
     writeFileSync(config.pairPath || pairPath, pairCode, { mode: 0o600 });
     clearTimeout(expiryTimer);
-    expiryTimer = setTimeout(renewCode, 5 * 60 * 1000);
+    expiryTimer = setTimeout(renewCode, pairingDuration);
     expiryTimer.unref();
   };
   writeFileSync(config.pairPath || pairPath, pairCode, { mode: 0o600 });
-  expiryTimer = setTimeout(renewCode, 5 * 60 * 1000);
+  expiryTimer = setTimeout(renewCode, pairingDuration);
   expiryTimer.unref();
   const allowed = new Set(config.allowedOrigins);
   const localHosts = new Set([
@@ -111,15 +112,37 @@ export function createAgentHttp({ config, hub, frontendDir, root }) {
         }
         const session = randomBytes(24).toString("base64url");
         renewCode();
+        const expires = Date.now() + 60 * 60 * 1000;
         sessions.set(session, {
-          expires: Date.now() + 60 * 60 * 1000,
+          expires,
           origin: callerOrigin,
         });
         response.setHeader("Content-Type", "application/json");
-        response.end(JSON.stringify({ session }));
+        response.end(JSON.stringify({ session, expires }));
       } catch {
         response.writeHead(400);
         response.end("Invalid request");
+      }
+      return;
+    }
+    if (url.pathname === "/api/session" && request.method === "POST") {
+      try {
+        const body = JSON.parse(await readBody(request));
+        const session = sessions.get(body.session);
+        if (
+          !session ||
+          session.expires < Date.now() ||
+          session.origin !== callerOrigin
+        ) {
+          response.writeHead(401);
+          response.end("Sesion vencida");
+          return;
+        }
+        response.setHeader("Content-Type", "application/json");
+        response.end(JSON.stringify({ expires: session.expires }));
+      } catch {
+        response.writeHead(400);
+        response.end("Solicitud invalida");
       }
       return;
     }
