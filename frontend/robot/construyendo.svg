@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 180" role="img" aria-label="Robot construyendo">
+<g stroke="#353e45" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M75 34V19m-6 0h12" fill="none"/><circle cx="75" cy="15" r="5" fill="#d8a15b"/>
+<rect x="28" y="36" width="94" height="88" rx="18" fill="#d6dedb"/><rect x="40" y="49" width="70" height="56" rx="11" fill="#39474b"/>
+<circle cx="59" cy="73" r="6" fill="#d8a15b" stroke="none"/><circle cx="91" cy="73" r="6" fill="#d8a15b" stroke="none"/>
+<text x="75" y="98" font-family="sans-serif" font-size="24" text-anchor="middle" fill="#d8a15b" stroke="none">◡</text>
+<path d="M28 77H16v30l12 7m94-37h12v30l-12 7" fill="#c4d0cc"/>
+<rect x="49" y="126" width="52" height="36" rx="9" fill="#d8a15b"/><path d="M61 162v10m28-10v10" fill="none"/>
+</g></svg>

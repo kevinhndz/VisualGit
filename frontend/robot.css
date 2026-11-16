@@ -1,0 +1,137 @@
+.local-pr-form {
+  margin: 18px;
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+.local-pr-form label {
+  display: grid;
+  gap: 5px;
+  font-size: 13px;
+}
+.local-pr-form input {
+  max-width: 420px;
+  padding: 8px;
+  background: #171b1e;
+  color: var(--text);
+  border: 1px solid var(--line);
+  font-size: 13px;
+}
+.local-pr-form button,
+.pr-actions button,
+.robot-popover button,
+.robot-bubble {
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #262c30;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.local-pr-form button {
+  width: max-content;
+}
+.local-pr-result {
+  min-height: 20px;
+  color: var(--green);
+}
+.pr-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.pr-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.robot-popover {
+  position: fixed;
+  z-index: 40;
+  right: 20px;
+  bottom: 20px;
+  width: min(430px, calc(100vw - 24px));
+  max-height: min(620px, 80vh);
+  overflow: auto;
+  resize: both;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f1eee4;
+  color: #28343a;
+  box-shadow: 0 12px 32px #0008;
+  font-size: 13px;
+}
+.robot-popover[hidden],
+.robot-bubble[hidden] {
+  display: none;
+}
+.robot-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: #d8dfda;
+  cursor: move;
+  touch-action: none;
+}
+.robot-header strong {
+  margin-right: auto;
+}
+.robot-content {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+}
+.robot-content > div {
+  flex: 1;
+  min-width: 0;
+}
+.robot-avatar {
+  width: 90px;
+  height: 112px;
+}
+.robot-stations {
+  padding-left: 20px;
+}
+.robot-step {
+  padding: 7px 0;
+  border-bottom: 1px solid #ccd3cf;
+}
+.robot-step span {
+  display: block;
+}
+.robot-step pre {
+  max-height: 140px;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: #273038;
+}
+.robot-step.ejecutando {
+  color: #8d612a;
+}
+.robot-step.aprobado {
+  color: #307253;
+}
+.robot-step.falló {
+  color: #a33838;
+}
+.robot-bubble {
+  position: fixed;
+  z-index: 40;
+  right: 16px;
+  bottom: 16px;
+}
+:focus-visible {
+  outline: 2px solid #e6b56b;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .robot-popover *,
+  .robot-bubble {
+    animation: none !important;
+    transition: none !important;
+  }
+}

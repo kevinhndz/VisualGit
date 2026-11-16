@@ -9,11 +9,49 @@ import { animateEvent, renderScene } from "./scene.js";
 import { demoSteps, freshDemo } from "./simulator.js";
 import { setupModules } from "./modules.js";
 import { setupTeacher } from "./teacher.js";
+import { setupLocalPr } from "./local-pr.js";
 
 const byId = (id) => document.getElementById(id);
 const savedSessionKey = "gitviz-session";
 const modules = setupModules();
 const teacher = setupTeacher();
+const localConflicts = new Set();
+function showLocalConflicts(prs = []) {
+  const active = new Set();
+  for (const pr of prs) {
+    if (pr.mergeable !== false || ["fusionado", "cerrado"].includes(pr.state))
+      continue;
+    const id = `local-pr-${pr.id}`;
+    active.add(id);
+    if (localConflicts.has(id)) continue;
+    localConflicts.add(id);
+    teacher.show({
+      id,
+      title: `Conflicto con ${pr.base}`,
+      what: `El PR local #${pr.id} no se puede unir todavía.`,
+      why: "Las dos ramas tienen cambios incompatibles que necesitan tu decisión.",
+      steps: [
+        { text: "Cambia a tu rama.", command: `git switch ${pr.head}` },
+        {
+          text: "Trae la rama de destino y resuelve los archivos.",
+          command: `git merge ${pr.base}`,
+        },
+        {
+          text: "Prepara los archivos y termina el merge.",
+          command: "git add .",
+        },
+      ],
+      avoid: "Actualiza tu rama mientras el PR sigue abierto.",
+      scene: "merge",
+    });
+  }
+  for (const id of localConflicts) {
+    if (!active.has(id)) {
+      localConflicts.delete(id);
+      teacher.resolved(id);
+    }
+  }
+}
 function updateNetworkStatus() {
   byId("network-status").textContent = navigator.onLine
     ? "Internet disponible. Git local también funciona sin internet."
@@ -44,6 +82,7 @@ function renderSnapshot(snapshot) {
   renderHistory(snapshot);
   renderGraph(snapshot);
   renderPullRequests(snapshot);
+  showLocalConflicts(snapshot.localPrs);
 }
 
 function setStatus(status) {
@@ -107,11 +146,18 @@ const client = new AgentClient((message) => {
   } else if (message.kind === "github") {
     currentSnapshot.github = message.github;
     renderSnapshot(currentSnapshot);
+  } else if (message.kind === "local-pr") {
+    currentSnapshot.localPrs = message.prs;
+    renderPullRequests(currentSnapshot);
+    showLocalConflicts(message.prs);
+  } else if (message.kind === "pipeline") {
+    localPr.onPipeline(message);
   } else if (message.kind === "teacher") {
     if (message.action === "show") teacher.show(message.problem);
     if (message.action === "resolved") teacher.resolved(message.id);
   }
 }, setStatus);
+const localPr = setupLocalPr(() => client);
 
 async function refreshGithubIfVisible() {
   if (modules.active() !== 2 || !navigator.onLine || !client.session) return;

@@ -106,7 +106,6 @@ if (command === "hook-event") {
   const line = args.slice(2).join(" ");
   if (
     Number.isInteger(exitCode) &&
-    exitCode !== 0 &&
     /^\s*git(?:\s|$)/.test(line) &&
     (process.platform === "win32" || existsSync(files.socketPath))
   ) {
@@ -192,7 +191,7 @@ if (command === "hook-event") {
     token: code,
     port,
     allowedOrigins: [`http://127.0.0.1:${port}`, `http://localhost:${port}`],
-    github: false,
+    github: true,
     useTrace2: false,
     noRepo: !existsSync(join(root, ".git")),
     frontendDir: resolve(

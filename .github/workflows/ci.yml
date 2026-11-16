@@ -29,6 +29,16 @@ jobs:
       - run: npm test
       - run: bash -n install.sh gitviz
 
+  ejecutable:
+    name: Ejecutable Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - uses: oven-sh/setup-bun@v2
+      - run: bun build --compile agent/desktop.mjs --asset ./frontend --asset ./rules --outfile git-visual
+      - run: ./git-visual estado
+
   pagina:
     name: Publicar frontend
     needs: pruebas
