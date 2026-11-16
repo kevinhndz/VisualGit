@@ -178,6 +178,14 @@ export async function startAgent(root, config) {
           config.useTrace2 !== false
         )
           return;
+        if (Number.isInteger(input.exitCode) && input.exitCode !== 0) {
+          void refresh({
+            command: input.command,
+            exitCode: input.exitCode,
+            source: "shell",
+          });
+          return;
+        }
         const event = semanticEvent(snapshot, snapshot, {
           command: input.command,
           ts: new Date().toISOString(),

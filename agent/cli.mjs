@@ -150,6 +150,21 @@ switch (command) {
     );
     break;
   }
+  case "emit-result": {
+    const exitCode = Number(process.argv[3]);
+    const command = process.argv.slice(4).join(" ");
+    if (
+      !Number.isInteger(exitCode) ||
+      exitCode === 0 ||
+      !/^\s*git(?:\s|$)/.test(command)
+    )
+      break;
+    if (!existsSync(socketPath)) break;
+    const socket = createConnection(socketPath);
+    socket.on("error", () => {});
+    socket.end(JSON.stringify({ cwd: process.cwd(), command, exitCode }));
+    break;
+  }
   case "hook-event": {
     if (!existsSync(socketPath)) break;
     const socket = createConnection(socketPath);

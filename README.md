@@ -26,7 +26,7 @@ Si Windows muestra SmartScreen, el ejecutable todavía no está firmado. Revisa 
 
 ## Usar
 
-Dentro de un repositorio, ejecuta `git visual`. Git busca el ejecutable `git-visual` en tu `PATH`. Se abre una ventana del navegador local. En la terminal aparece un código de seis dígitos; escríbelo en la pantalla **Setup**. El código dura cinco minutos y solo sirve una vez. Tras cinco intentos fallidos se genera otro código. El agente solo escucha en `127.0.0.1`.
+Dentro de un repositorio, ejecuta `git visual`. Git busca el ejecutable `git-visual` en tu `PATH`. Se abre una ventana del navegador local. En la terminal aparece un código de seis dígitos; escríbelo en la pantalla **Setup**. El código dura una hora y solo sirve una vez. Tras cinco intentos fallidos se genera otro código. La sesión conectada dura una hora y se conserva al recargar la misma pestaña. El agente solo escucha en `127.0.0.1`.
 
 ```sh
 git visual                  # abre el agente y la interfaz
@@ -41,6 +41,12 @@ git visual desinstalar      # retira la instalación del usuario
 Si inicias la aplicación fuera de un repositorio, Setup permite escribir la ruta de la carpeta que quieres observar. Cada repositorio tiene su propio agente, puerto y código. Las acciones de Git siguen funcionando sin conexión a Internet.
 
 En **Setup** puedes instalar los avisos de Git de este repositorio. Los hooks nuevos llaman primero a tus hooks anteriores; al quitarlos, se restaura su configuración. También puedes añadir o quitar la integración de bash o zsh. Cada botón explica el archivo que cambia. La pantalla **Flujo** conserva las seis escenas; **PR/CI** muestra los datos que conoce el agente; **Commits y ramas** muestra el historial.
+
+## Profesor de Git
+
+Cuando Git informa un error o el repositorio entra en un estado que requiere atención, aparece un profesor junto a una pizarra. Pulsa **Siguiente** para ver qué pasó, por qué, cómo arreglarlo y cómo evitarlo. Los comandos sugeridos tienen un botón **Copiar**: Git Visual nunca los ejecuta por ti. Puedes mover la ventana, cambiar su tamaño, minimizarla o cerrarla. Los errores siguientes esperan en una cola. Al resolver el problema, el profesor te lo indica y se cierra unos segundos después.
+
+Para que el ejecutable reciba también los códigos de salida de comandos fallidos en tu terminal, pulsa **Instalar integración de terminal** en Setup y abre una terminal nueva. Si ya la habías instalado, pulsa el botón otra vez para actualizar el bloque de Git Visual. El bloque anterior se sustituye sin tocar el resto de tu archivo de inicio. El antiguo control `gitviz` usa además los mensajes de error de Git Trace2. Algunos programas externos no envían su texto de error por ese canal; en esos casos la pizarra muestra una explicación general y puedes leer el detalle completo en tu terminal.
 
 ## Estado de las fases
 

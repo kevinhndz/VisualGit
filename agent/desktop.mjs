@@ -101,6 +101,19 @@ if (command === "hook-event") {
     socket.on("error", () => {});
     socket.end(JSON.stringify({ cwd: process.cwd(), command: line }));
   }
+} else if (command === "emit-result") {
+  const exitCode = Number(args[1]);
+  const line = args.slice(2).join(" ");
+  if (
+    Number.isInteger(exitCode) &&
+    exitCode !== 0 &&
+    /^\s*git(?:\s|$)/.test(line) &&
+    (process.platform === "win32" || existsSync(files.socketPath))
+  ) {
+    const socket = createConnection(files.socketPath);
+    socket.on("error", () => {});
+    socket.end(JSON.stringify({ cwd: process.cwd(), command: line, exitCode }));
+  }
 } else if (command === "desinstalar") {
   for (const name of readdirSync(stateDir)) {
     if (!/^[0-9a-f]{16}\.json$/.test(name)) continue;

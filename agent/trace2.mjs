@@ -40,18 +40,25 @@ export class TraceReader {
 
   accept(record) {
     if (!record.sid) return;
-    const session = this.sessions.get(record.sid) || { argv: null, root: null };
+    const session = this.sessions.get(record.sid) || {
+      argv: null,
+      root: null,
+      errors: [],
+    };
     if (record.event === "start") {
       session.argv = record.argv;
       session.startTime = record.time;
     }
     if (record.event === "def_repo")
       session.root = record.worktree ? resolve(record.worktree) : null;
+    if (record.event === "error" && typeof record.msg === "string")
+      session.errors.push(record.msg.slice(0, 500));
     if (record.event === "exit") {
       if (session.root === this.root && Array.isArray(session.argv)) {
         this.onCommand({
           argv: session.argv,
           exitCode: record.code,
+          stderr: session.errors.join("\n").slice(0, 2000),
           ts: session.startTime || record.time,
           source: "trace2",
         });
