@@ -10,10 +10,17 @@ import { TraceReader } from "./trace2.mjs";
 import { RepoWatcher } from "./watcher.mjs";
 import { fetchGithub } from "./github.mjs";
 import { socketPath, tracePath } from "./config.mjs";
+import {
+  commandProblem,
+  pipelineProblem,
+  pullRequestProblem,
+  stateProblems,
+} from "./teacher.mjs";
 
 export async function startAgent(root, config) {
   root = resolve(root);
   let snapshot = await takeSnapshot(root);
+  snapshot.problems = stateProblems(snapshot);
   const hub = new EventHub(() => snapshot);
   const frontendDir =
     config.frontendDir ||
@@ -36,6 +43,7 @@ export async function startAgent(root, config) {
     pending = pending
       .then(async () => {
         const next = await takeSnapshot(root);
+        next.problems = stateProblems(next);
         const changed = snapshotSignature(snapshot) !== snapshotSignature(next);
         if (input?.source === "hook" && !changed) return;
         if (!input && !changed) return;
@@ -46,8 +54,33 @@ export async function startAgent(root, config) {
           lastCommand = { key, at: Date.now() };
         }
         const event = semanticEvent(snapshot, next, input || {});
+        const beforeProblems = snapshot.problems;
         snapshot = { ...next, github: snapshot.github };
         hub.publish({ kind: "event", event, snapshot });
+        if (event.type === "push" && event.exitCode === 0)
+          hub.publish({
+            kind: "teacher",
+            action: "resolved",
+            id: "push-rejected",
+          });
+        if (input?.exitCode && input.exitCode !== 0) {
+          const problem = commandProblem(
+            { ...event, stderr: input.stderr },
+            next,
+          );
+          if (problem)
+            hub.publish({ kind: "teacher", action: "show", problem });
+        }
+        const previous = new Set((beforeProblems || []).map((item) => item.id));
+        const current = new Set(next.problems.map((item) => item.id));
+        for (const problem of next.problems) {
+          if (!previous.has(problem.id))
+            hub.publish({ kind: "teacher", action: "show", problem });
+        }
+        for (const id of previous) {
+          if (!current.has(id))
+            hub.publish({ kind: "teacher", action: "resolved", id });
+        }
         if (event.type === "push" && config.github !== false)
           void updateGithub();
       })
@@ -66,6 +99,42 @@ export async function startAgent(root, config) {
     const old = snapshot.github;
     snapshot = { ...snapshot, github: next };
     hub.publish({ kind: "github", github: next });
+    const oldProblems = new Map();
+    for (const pr of old?.prs || []) {
+      if (pr.mergeStateStatus === "DIRTY")
+        oldProblems.set(`pr-${pr.number}`, pullRequestProblem(pr));
+      for (const check of pr.checks || []) {
+        if (
+          ["FAILURE", "TIMED_OUT", "ACTION_REQUIRED"].includes(check.conclusion)
+        )
+          oldProblems.set(
+            `ci-${pr.number}-${check.name}`,
+            pipelineProblem(pr, check),
+          );
+      }
+    }
+    const newProblems = new Map();
+    for (const pr of next.prs || []) {
+      if (pr.mergeStateStatus === "DIRTY")
+        newProblems.set(`pr-${pr.number}`, pullRequestProblem(pr));
+      for (const check of pr.checks || []) {
+        if (
+          ["FAILURE", "TIMED_OUT", "ACTION_REQUIRED"].includes(check.conclusion)
+        )
+          newProblems.set(
+            `ci-${pr.number}-${check.name}`,
+            pipelineProblem(pr, check),
+          );
+      }
+    }
+    for (const [id, problem] of newProblems) {
+      if (!oldProblems.has(id))
+        hub.publish({ kind: "teacher", action: "show", problem });
+    }
+    for (const id of oldProblems.keys()) {
+      if (!newProblems.has(id))
+        hub.publish({ kind: "teacher", action: "resolved", id });
+    }
     if (
       JSON.stringify(old?.prs) !== JSON.stringify(next.prs) &&
       next.prs.length
