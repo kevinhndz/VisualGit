@@ -1,0 +1,72 @@
+name: Ejecutables Git Visual
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  compilar:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            target: bun-linux-x64
+            asset: git-visual-linux-x64
+            flags: ""
+          - runner: ubuntu-24.04-arm
+            target: bun-linux-arm64
+            asset: git-visual-linux-arm64
+            flags: ""
+          - runner: macos-15-intel
+            target: bun-darwin-x64
+            asset: git-visual-darwin-x64
+            flags: ""
+          - runner: macos-15
+            target: bun-darwin-arm64
+            asset: git-visual-darwin-arm64
+            flags: ""
+          - runner: windows-latest
+            target: bun-windows-x64
+            asset: git-visual-windows-x64.exe
+            flags: '--windows-icon=frontend/images/app-icon.ico --windows-title="Git Visual" --windows-description="Git Visual"'
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - uses: oven-sh/setup-bun@v2
+      - name: Crear ejecutable
+        shell: bash
+        run: |
+          mkdir -p dist
+          bun build --compile --target=${{ matrix.target }} agent/desktop.mjs --asset ./frontend ${{ matrix.flags }} --outfile dist/${{ matrix.asset }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+          if-no-files-found: error
+
+  publicar:
+    needs: compilar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Preparar checksums
+        run: |
+          cp frontend/images/app-icon.png frontend/images/app-icon.icns install.sh install.ps1 dist/
+          cd dist
+          sha256sum git-visual-* app-icon.* install.sh install.ps1 > SHA256SUMS
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*

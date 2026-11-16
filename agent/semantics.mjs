@@ -86,7 +86,7 @@ export function semanticEvent(before, after, input = {}) {
         "Git actualizo las ramas remotas sin tocar tus archivos de trabajo.",
       ],
       merge: [
-        after.operation === "merge" ? "conflict" : "merge",
+        after.operation === "merge" ? "merge_conflict" : "merge",
         after.operation === "merge" ? "Conflicto de merge" : "Ramas unidas",
         after.operation === "merge"
           ? "Hay conflictos que debes resolver antes de continuar."
@@ -103,7 +103,7 @@ export function semanticEvent(before, after, input = {}) {
         "Git aplico un commit de otra rama en este cuaderno.",
       ],
       revert: [
-        "commit",
+        "revert",
         "Cambio revertido",
         "Git creo un commit que deshace otro cambio.",
       ],
@@ -156,7 +156,7 @@ export function semanticEvent(before, after, input = {}) {
             "La rama local desaparecio; sus commits pueden seguir en otras referencias.",
           ]
         : [
-            "branch",
+            "branch_created",
             "Cuaderno actualizado",
             "Git creo, renombro o mostro una rama.",
           ];
@@ -164,12 +164,12 @@ export function semanticEvent(before, after, input = {}) {
       [type, title, explanation] =
         args.includes("-c") || args.includes("-b")
           ? [
-              "branch",
+              "branch_created",
               "Cuaderno nuevo",
               "Git creo una rama nueva y movio HEAD a ella.",
             ]
           : [
-              "switch",
+              "checkout",
               "Cuaderno cambiado",
               "HEAD paso a otra rama y los archivos reflejan su version.",
             ];
@@ -184,10 +184,94 @@ export function semanticEvent(before, after, input = {}) {
       explanation += " El estado observado no cambio.";
     }
   } else if (didChange) {
-    type = "file";
-    title = "Archivo actualizado";
-    explanation =
-      "Una edicion fuera de Git cambio el estado de tu carpeta de trabajo.";
+    const beforeBranches = new Set(
+      (before.branches || []).map((branch) => branch.name),
+    );
+    const newBranch = (after.branches || []).find(
+      (branch) => !beforeBranches.has(branch.name),
+    );
+    const oldRemotes = new Map(
+      (before.remotes || []).map((branch) => [branch.name, branch.hash]),
+    );
+    const remoteMoved = (after.remotes || []).some(
+      (branch) => oldRemotes.get(branch.name) !== branch.hash,
+    );
+    const oldStaged = new Set(
+      (before.files || [])
+        .filter((file) => file.index !== "." && file.index !== "?")
+        .map((file) => file.path),
+    );
+    const addedToStage = (after.files || []).some(
+      (file) =>
+        file.index !== "." && file.index !== "?" && !oldStaged.has(file.path),
+    );
+    if (after.operation === "merge" && before.operation !== "merge") {
+      [type, title, explanation] = [
+        "merge_conflict",
+        "Conflicto al unir ramas",
+        "Git encontró archivos que debes revisar para terminar la unión.",
+      ];
+    } else if (before.branch !== after.branch) {
+      [type, title, explanation] = [
+        "checkout",
+        "Cambiaste de rama",
+        "Ahora ves los archivos de otra rama.",
+      ];
+    } else if (newBranch) {
+      [type, title, explanation] = [
+        "branch_created",
+        "Rama creada",
+        `Git creó la rama ${newBranch.name}.`,
+      ];
+    } else if (before.head !== after.head) {
+      const subject = after.commits?.[0]?.subject || "";
+      [type, title, explanation] = subject.startsWith("Revert ")
+        ? [
+            "revert",
+            "Cambio revertido",
+            "Git creó un commit que deshace un cambio anterior.",
+          ]
+        : remoteMoved
+          ? [
+              "pull",
+              "Cambios recibidos",
+              "Tu rama avanzó con cambios del remoto.",
+            ]
+          : [
+              "commit",
+              "Commit guardado",
+              "Los cambios preparados se guardaron en el repositorio local.",
+            ];
+    } else if (remoteMoved) {
+      const pushed = (after.remotes || []).some(
+        (branch) =>
+          oldRemotes.get(branch.name) !== branch.hash &&
+          branch.hash === after.head,
+      );
+      [type, title, explanation] = pushed
+        ? [
+            "push",
+            "Cambios enviados",
+            "La rama remota ahora apunta a tu commit.",
+          ]
+        : [
+            "pull",
+            "Referencias remotas actualizadas",
+            "Git actualizó la información que tienes del remoto.",
+          ];
+    } else if (addedToStage) {
+      [type, title, explanation] = [
+        "add",
+        "Archivo preparado",
+        "Git puso cambios en la bandeja de staging.",
+      ];
+    } else {
+      [type, title, explanation] = [
+        "file",
+        "Archivo actualizado",
+        "Un archivo de tu carpeta de trabajo cambió.",
+      ];
+    }
   }
 
   const oldFiles = new Set((before.files || []).map((file) => file.path));
@@ -211,6 +295,15 @@ export function semanticEvent(before, after, input = {}) {
     refs: after.branches.map((branch) => branch.name),
     from: before.head,
     to: after.head,
+    hash: type === "commit" || type === "revert" ? after.head : null,
+    parent:
+      type === "commit" || type === "revert"
+        ? after.commits?.[0]?.parents?.[0] || null
+        : null,
+    message:
+      type === "commit" || type === "revert"
+        ? after.commits?.[0]?.subject || ""
+        : "",
     exitCode,
     ts: input.ts || new Date().toISOString(),
   };

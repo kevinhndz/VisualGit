@@ -10,33 +10,45 @@ import { TraceReader } from "./trace2.mjs";
 import { RepoWatcher } from "./watcher.mjs";
 import { fetchGithub } from "./github.mjs";
 import { socketPath, tracePath } from "./config.mjs";
+import { commandProblem, githubProblems, stateProblems } from "./teacher.mjs";
 
 export async function startAgent(root, config) {
   root = resolve(root);
   let snapshot = await takeSnapshot(root);
+  snapshot.problems = stateProblems(snapshot);
   const hub = new EventHub(() => snapshot);
-  const frontendDir = resolve(
-    dirname(fileURLToPath(import.meta.url)),
-    "..",
-    "frontend",
-  );
-  const http = createAgentHttp({ config, hub, frontendDir });
-  const trace = new TraceReader(
-    tracePath,
+  const frontendDir =
+    config.frontendDir ||
+    resolve(dirname(fileURLToPath(import.meta.url)), "..", "frontend");
+  const http = createAgentHttp({
+    config: { ...config, refreshGithub: () => updateGithub() },
+    hub,
+    frontendDir,
     root,
-    (input) => void refresh(input),
-  );
+  });
+  const trace =
+    config.useTrace2 === false
+      ? null
+      : new TraceReader(
+          config.tracePath || tracePath,
+          root,
+          (input) => void refresh(input),
+        );
   const watcher = new RepoWatcher(root, () => scheduleWatch());
   let watchTimer = null;
   let pending = Promise.resolve();
-  let githubTimer = null;
   let lastCommand = null;
 
   function refresh(input = null) {
     pending = pending
       .then(async () => {
         const next = await takeSnapshot(root);
+        next.problems = [
+          ...stateProblems(next),
+          ...githubProblems(snapshot.github),
+        ];
         const changed = snapshotSignature(snapshot) !== snapshotSignature(next);
+        if (input?.source === "hook" && !changed) return;
         if (!input && !changed) return;
         if (input?.source === "trace2") {
           const key = input.argv.join(" ");
@@ -45,8 +57,35 @@ export async function startAgent(root, config) {
           lastCommand = { key, at: Date.now() };
         }
         const event = semanticEvent(snapshot, next, input || {});
+        const beforeProblems = snapshot.problems;
         snapshot = { ...next, github: snapshot.github };
         hub.publish({ kind: "event", event, snapshot });
+        if (event.type === "push" && event.exitCode === 0)
+          hub.publish({
+            kind: "teacher",
+            action: "resolved",
+            id: "push-rejected",
+          });
+        if (input?.exitCode && input.exitCode !== 0) {
+          const problem = commandProblem(
+            { ...event, stderr: input.stderr },
+            next,
+          );
+          if (problem)
+            hub.publish({ kind: "teacher", action: "show", problem });
+        }
+        const previous = new Set((beforeProblems || []).map((item) => item.id));
+        const current = new Set(next.problems.map((item) => item.id));
+        for (const problem of next.problems) {
+          if (!previous.has(problem.id))
+            hub.publish({ kind: "teacher", action: "show", problem });
+        }
+        for (const id of previous) {
+          if (!current.has(id))
+            hub.publish({ kind: "teacher", action: "resolved", id });
+        }
+        if (event.type === "push" && config.github !== false)
+          void updateGithub();
       })
       .catch((error) => console.error("Snapshot:", error.message));
     return pending;
@@ -61,8 +100,26 @@ export async function startAgent(root, config) {
     const next = await fetchGithub(root);
     if (JSON.stringify(next) === JSON.stringify(snapshot.github)) return;
     const old = snapshot.github;
-    snapshot = { ...snapshot, github: next };
+    snapshot = {
+      ...snapshot,
+      github: next,
+      problems: [...stateProblems(snapshot), ...githubProblems(next)],
+    };
     hub.publish({ kind: "github", github: next });
+    const oldProblems = new Map(
+      githubProblems(old).map((item) => [item.id, item]),
+    );
+    const newProblems = new Map(
+      githubProblems(next).map((item) => [item.id, item]),
+    );
+    for (const [id, problem] of newProblems) {
+      if (!oldProblems.has(id))
+        hub.publish({ kind: "teacher", action: "show", problem });
+    }
+    for (const id of oldProblems.keys()) {
+      if (!newProblems.has(id))
+        hub.publish({ kind: "teacher", action: "resolved", id });
+    }
     if (
       JSON.stringify(old?.prs) !== JSON.stringify(next.prs) &&
       next.prs.length
@@ -73,8 +130,8 @@ export async function startAgent(root, config) {
           (check) =>
             check.status === "IN_PROGRESS" || check.conclusion === "FAILURE",
         )
-          ? "ci"
-          : "pr",
+          ? "pipeline_step"
+          : "pr_updated",
         title: "GitHub actualizo el Pull Request",
         explanation: `PR #${pr.number}: ${pr.title}. ${pr.checks.length} checks observados.`,
         command: `GitHub PR #${pr.number}`,
@@ -95,9 +152,25 @@ export async function startAgent(root, config) {
         const input = JSON.parse(data);
         const cwd = resolve(input.cwd);
         if (cwd !== root && !cwd.startsWith(root + sep)) return;
+        if (typeof input.hook === "string") {
+          void refresh({ source: "hook", hook: input.hook });
+          return;
+        }
         if (typeof input.command !== "string" || input.command.length > 300)
           return;
-        if (/^\s*git(?:\s|$)/.test(input.command)) return;
+        if (
+          !/^\s*git(?:\s|$)/.test(input.command) ||
+          config.useTrace2 !== false
+        )
+          return;
+        if (Number.isInteger(input.exitCode) && input.exitCode !== 0) {
+          void refresh({
+            command: input.command,
+            exitCode: input.exitCode,
+            source: "shell",
+          });
+          return;
+        }
         const event = semanticEvent(snapshot, snapshot, {
           command: input.command,
           ts: new Date().toISOString(),
@@ -117,26 +190,27 @@ export async function startAgent(root, config) {
     http.once("error", reject);
     http.listen(config.port, "127.0.0.1", resolveListen);
   });
-  if (existsSync(socketPath)) unlinkSync(socketPath);
+  const commandSocket = config.socketPath || socketPath;
+  if (process.platform !== "win32" && existsSync(commandSocket))
+    unlinkSync(commandSocket);
   await new Promise((resolveListen) =>
-    socket.listen(socketPath, resolveListen),
+    socket.listen(commandSocket, resolveListen),
   );
-  chmodSync(socketPath, 0o600);
-  await trace.start();
-  watcher.start();
+  if (process.platform !== "win32") chmodSync(commandSocket, 0o600);
+  if (trace) await trace.start();
+  if (!config.noRepo) watcher.start();
   if (config.github !== false) {
     void updateGithub();
-    githubTimer = setInterval(() => void updateGithub(), 5000);
   }
 
   return async () => {
     clearTimeout(watchTimer);
-    clearInterval(githubTimer);
-    trace.stop();
+    trace?.stop();
     watcher.stop();
     hub.close();
     socket.close();
     http.close();
-    if (existsSync(socketPath)) unlinkSync(socketPath);
+    if (process.platform !== "win32" && existsSync(commandSocket))
+      unlinkSync(commandSocket);
   };
 }

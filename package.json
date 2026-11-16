@@ -15,5 +15,8 @@
   },
   "devDependencies": {
     "prettier": "3.5.3"
+  },
+  "dependencies": {
+    "ws": "^8.23.0"
   }
 }

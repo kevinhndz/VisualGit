@@ -1,5 +1,5 @@
 export function parseStatus(output) {
-  const result = { branch: null, head: null, files: [] };
+  const result = { branch: null, head: null, ahead: 0, behind: 0, files: [] };
   const records = output.split("\0");
   for (let i = 0; i < records.length; i++) {
     const record = records[i];
@@ -9,6 +9,12 @@ export function parseStatus(output) {
       result.head = hash === "(initial)" ? null : hash;
     } else if (record.startsWith("# branch.head ")) {
       result.branch = record.slice(14);
+    } else if (record.startsWith("# branch.ab ")) {
+      const match = record.match(/\+([0-9]+) -([0-9]+)/);
+      if (match) {
+        result.ahead = Number(match[1]);
+        result.behind = Number(match[2]);
+      }
     } else if (record.startsWith("? ")) {
       result.files.push({
         path: record.slice(2),

@@ -9,7 +9,6 @@ export class RepoWatcher {
     this.root = root;
     this.onChange = onChange;
     this.watches = new Map();
-    this.poller = null;
     this.refreshTimer = null;
   }
 
@@ -71,11 +70,9 @@ export class RepoWatcher {
 
   start() {
     this.scan();
-    this.poller = setInterval(this.onChange, 300);
   }
 
   stop() {
-    clearInterval(this.poller);
     clearTimeout(this.refreshTimer);
     for (const handle of this.watches.values()) handle.close();
     this.watches.clear();

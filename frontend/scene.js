@@ -127,6 +127,22 @@ export function renderScene(snapshot) {
   byId("working-summary").textContent =
     `${working.length} archivos sin preparar`;
   byId("stage-summary").textContent = `${staged.length} archivos preparados`;
+  replaceList(
+    "stage-plates",
+    staged.map((file) =>
+      element("span", "stage-plate", file.path.split("/").pop()),
+    ),
+    "",
+    8,
+  );
+  replaceList(
+    "repo-blocks",
+    (snapshot.commits || [])
+      .slice(0, 3)
+      .map((commit) => element("span", "repo-block", commit.hash.slice(0, 7))),
+    "",
+    3,
+  );
   byId("repo-summary").textContent =
     snapshot.head?.slice(0, 7) || "Sin commits todavia";
   byId("remote-summary").textContent = snapshot.remotes?.length
@@ -163,6 +179,7 @@ const flights = {
   add: [0, 1],
   unstage: [1, 0],
   commit: [1, 2],
+  revert: [2, 1],
   push: [2, 3],
   fetch: [3, 2],
   pull: [3, 0],
@@ -174,6 +191,7 @@ export function animateEvent(event) {
   const followsLive = selectStage(eventStage(event.type), false);
   const cards = [...document.querySelectorAll(".scene .zone")];
   const route = flights[event.type];
+  let flightDone = Promise.resolve();
   if (route && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const layer = byId("motion-layer");
     const box = layer.getBoundingClientRect();
@@ -182,7 +200,11 @@ export function animateEvent(event) {
     const packet = element(
       "span",
       "flying-packet",
-      event.type === "commit" ? "commit" : "cambios",
+      event.type === "commit"
+        ? event.hash?.slice(0, 7) || "commit"
+        : event.type === "add"
+          ? event.files?.[0]?.split("/").pop() || "archivo"
+          : "cambios",
     );
     packet.style.left = `${from.left - box.left + from.width / 2}px`;
     packet.style.top = `${from.top - box.top + from.height / 2}px`;
@@ -199,11 +221,15 @@ export function animateEvent(event) {
       { duration: 650, easing: "ease-in-out" },
     );
     animation.onfinish = () => packet.remove();
+    flightDone = animation.finished
+      .catch(() => {})
+      .finally(() => packet.remove());
   }
-  if (!followsLive) return;
+  if (!followsLive) return flightDone;
   byId("narration").classList.toggle("failed", event.type === "error");
   byId("narration-title").textContent =
     event.title || "Cambio en el repositorio";
   byId("narration-text").textContent =
     event.explanation || "Estado actualizado desde tu terminal.";
+  return flightDone;
 }

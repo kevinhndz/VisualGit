@@ -40,8 +40,12 @@ export function eventStage(type) {
       commit: 2,
       amend: 2,
       branch: 2,
+      branch_created: 2,
       branch_delete: 2,
       switch: 2,
+      checkout: 2,
+      revert: 2,
+      merge_conflict: 2,
       merge: 2,
       rebase: 2,
       push: 3,
@@ -49,7 +53,9 @@ export function eventStage(type) {
       pull: 3,
       remote: 3,
       pr: 4,
+      pr_updated: 4,
       ci: 4,
+      pipeline_step: 4,
     }[type] ?? 2
   );
 }

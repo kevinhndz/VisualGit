@@ -20,12 +20,13 @@
 .graph-heading span {
   color: #8fa6c2;
   font:
-    10px ui-monospace,
+    13px ui-monospace,
     monospace;
 }
 
 .graph-scroll {
-  overflow-x: auto;
+  overflow: auto;
+  min-height: 60vh;
   scrollbar-color: #526077 transparent;
 }
 
@@ -55,11 +56,19 @@
 #commit-graph text {
   fill: #adc3df;
   font:
-    10px ui-monospace,
+    13px ui-monospace,
     monospace;
 }
 
 #commit-graph .ref-label {
   fill: #e3d7ff;
   font-weight: bold;
+}
+
+#commit-graph g[data-hash] {
+  cursor: pointer;
+}
+
+#commit-graph g[data-hash]:focus-visible {
+  outline: 2px solid #e9bd6a;
 }

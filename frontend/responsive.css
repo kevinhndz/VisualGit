@@ -85,10 +85,10 @@
     font-size: 23px;
   }
   .actor strong {
-    font-size: 11px;
+    font-size: 13px;
   }
   .actor small {
-    font-size: 10px;
+    font-size: 13px;
   }
   .sidebar {
     display: flex;
@@ -98,7 +98,7 @@
     max-height: 250px;
   }
   .branch-chip {
-    font-size: 10px;
+    font-size: 13px;
   }
   footer {
     padding: 10px;

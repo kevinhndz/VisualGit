@@ -23,12 +23,14 @@ import {
   loadConfig,
   logPath,
   pidPath,
+  pairPath,
   restoreTraceConfig,
   saveConfig,
   socketPath,
   tracePath,
 } from "./config.mjs";
 import { installHook, uninstallHooks } from "./hooks.mjs";
+import { installRepoHooks, uninstallRepoHooks } from "./repo-hooks.mjs";
 
 const command = process.argv[2] || "help";
 const wrapper = resolve(fileURLToPath(new URL("../gitviz", import.meta.url)));
@@ -45,6 +47,12 @@ function runningPid() {
   } catch {
     return null;
   }
+}
+
+function currentPairCode(config) {
+  return existsSync(pairPath)
+    ? readFileSync(pairPath, "utf8").trim()
+    : config.token;
 }
 
 function stop() {
@@ -75,6 +83,9 @@ switch (command) {
     const pid = runningPid();
     if (pid) {
       console.log(`El agente ya esta iniciado (PID ${pid}).`);
+      console.log(
+        `Abre http://127.0.0.1:${config.port} y pega el codigo: ${currentPairCode(config)}`,
+      );
       break;
     }
     ensureDirectories();
@@ -106,7 +117,7 @@ switch (command) {
   case "token": {
     const config = loadConfig();
     if (!config) throw new Error("Git Visual no esta instalado.");
-    console.log(config.token);
+    console.log(currentPairCode(config));
     break;
   }
   case "allow-origin": {
@@ -127,6 +138,7 @@ switch (command) {
     break;
   }
   case "emit": {
+    if (!/^\s*git(?:\s|$)/.test(process.argv.slice(3).join(" "))) break;
     if (!existsSync(socketPath)) break;
     const socket = createConnection(socketPath);
     socket.on("error", () => {});
@@ -138,6 +150,42 @@ switch (command) {
     );
     break;
   }
+  case "emit-result": {
+    const exitCode = Number(process.argv[3]);
+    const command = process.argv.slice(4).join(" ");
+    if (
+      !Number.isInteger(exitCode) ||
+      exitCode === 0 ||
+      !/^\s*git(?:\s|$)/.test(command)
+    )
+      break;
+    if (!existsSync(socketPath)) break;
+    const socket = createConnection(socketPath);
+    socket.on("error", () => {});
+    socket.end(JSON.stringify({ cwd: process.cwd(), command, exitCode }));
+    break;
+  }
+  case "hook-event": {
+    if (!existsSync(socketPath)) break;
+    const socket = createConnection(socketPath);
+    socket.on("error", () => {});
+    socket.end(JSON.stringify({ cwd: process.cwd(), hook: process.argv[3] }));
+    break;
+  }
+  case "instalar-hooks":
+    console.log(
+      installRepoHooks(process.cwd())
+        ? "Hooks instalados en este repositorio."
+        : "Los hooks ya estaban instalados.",
+    );
+    break;
+  case "quitar-hooks":
+    console.log(
+      uninstallRepoHooks(process.cwd())
+        ? "Hooks retirados de este repositorio."
+        : "No hay hooks de Git Visual que retirar.",
+    );
+    break;
   case "hook": {
     const action = process.argv[3];
     if (action === "install") {
@@ -162,6 +210,11 @@ switch (command) {
   }
   case "uninstall": {
     stop();
+    try {
+      uninstallRepoHooks(process.cwd());
+    } catch {
+      /* The current folder may not be a repository. */
+    }
     uninstallHooks();
     const config = loadConfig();
     if (config && !restoreTraceConfig(config))
@@ -174,7 +227,14 @@ switch (command) {
       readlinkSync(userBin) === wrapper
     )
       rmSync(userBin);
-    for (const path of [configPath, tracePath, logPath, pidPath, socketPath])
+    for (const path of [
+      configPath,
+      tracePath,
+      logPath,
+      pidPath,
+      socketPath,
+      pairPath,
+    ])
       if (existsSync(path)) rmSync(path);
     console.log("Git Visual desinstalado.");
     break;

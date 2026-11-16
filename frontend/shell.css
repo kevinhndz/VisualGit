@@ -32,7 +32,7 @@
   align-items: center;
   gap: 7px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
 }
 .status-dot {
   width: 6px;
@@ -54,7 +54,7 @@
   align-items: center;
 }
 .latency {
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   color: var(--muted);
 }
 .workspace {
@@ -67,7 +67,7 @@
   align-items: baseline;
   border-bottom: 1px solid var(--line);
   background: var(--surface);
-  font-size: 12px;
+  font-size: 13px;
   min-height: 42px;
 }
 .narration strong {
@@ -83,6 +83,6 @@
 footer {
   padding: 12px 18px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   border-top: 1px solid var(--line);
 }

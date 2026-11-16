@@ -25,7 +25,7 @@
   border-color: #3b74ee;
 }
 .zone h2 {
-  font-size: 12px;
+  font-size: 13px;
   margin: 0;
   font-weight: 600;
   display: flex;
@@ -47,7 +47,7 @@
   background: #e9aa44;
 }
 .zone-kicker {
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   color: var(--muted);
   margin: 4px 0 0;
   overflow: hidden;
@@ -68,14 +68,14 @@
   min-height: 52px;
 }
 .zone-summary strong {
-  font: 11px var(--mono);
+  font: 13px var(--mono);
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .zone-summary small {
-  font-size: 10px;
+  font-size: 13px;
   color: var(--muted);
   display: block;
   margin-top: 3px;
@@ -88,7 +88,7 @@
 }
 .command-path button {
   justify-self: center;
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   background: #141618;
   padding: 5px 9px;
 }
@@ -106,7 +106,7 @@
   color: white;
   border-radius: 4px;
   padding: 5px 10px;
-  font: 10px var(--mono);
+  font: 13px var(--mono);
   white-space: nowrap;
   box-shadow: 0 3px 16px #0008;
 }

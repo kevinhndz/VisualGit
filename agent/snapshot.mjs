@@ -92,6 +92,9 @@ export async function takeSnapshot(root) {
     repo: basename(root),
     initialized: status.ok,
     branch: parsed.branch,
+    detached: parsed.branch === "(detached)",
+    ahead: parsed.ahead || 0,
+    behind: parsed.behind || 0,
     head: parsed.head,
     files: parsed.files,
     branches: refData.branches,
@@ -105,6 +108,6 @@ export async function takeSnapshot(root) {
 }
 
 export function snapshotSignature(snapshot) {
-  const { github, ...local } = snapshot;
+  const { github, problems, ...local } = snapshot;
   return JSON.stringify(local);
 }
